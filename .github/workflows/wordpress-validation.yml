@@ -21,14 +21,20 @@ jobs:
       - name: Lint affected PHP entry points
         run: |
           php -l wp-content/themes/divi-child-iahs/functions.php
+          php -l wp-content/themes/divi-child-iahs/templates/home-modern.php
           php -l wp-content/plugins/wp-file-manager-pro/file_folder_manager_pro.php
           php -l wp-content/plugins/health-check/HealthCheck/class-health-check.php
           php -l scripts/test-health-check-hooks.php
           php -l scripts/test-wp-file-manager-bootstrap.php
+          php -l scripts/test-navigation-links.php
       - name: Test Health Check initialization order
         run: php scripts/test-health-check-hooks.php
       - name: Test WP File Manager bootstrap paths
         run: php scripts/test-wp-file-manager-bootstrap.php
+      - name: Test WordPress-aware navigation URLs
+        run: php scripts/test-navigation-links.php
+      - name: Test read-only routing diagnostics
+        run: scripts/test-routing-diagnostic.sh
       - name: Test release integrity policy
         run: scripts/test-release-integrity.sh
       - name: Test full and recovery release assembly

@@ -35,13 +35,13 @@ get_header();
                     Flexible learning, career-focused courses, and internationally recognized qualifications.
                 </p>
                 <div class="hero-buttons animate-fade-in-up">
-                    <a href="/programs-qualifications" class="et_pb_button btn-primary-modern">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/')); ?>" class="et_pb_button btn-primary-modern">
                         <span>Explore Programs</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
-                    <a href="/contact" class="et_pb_button btn-secondary-modern">
+                    <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="et_pb_button btn-secondary-modern">
                         <span>Speak to Advisor</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2C16.75 2 21 6.25 21 11.5Z" stroke="currentColor" stroke-width="1.5"/>
@@ -113,7 +113,7 @@ get_header();
                     </div>
                     <h3>Globally Recognized</h3>
                     <p>Our qualifications are respected by employers and institutions worldwide, opening doors to international opportunities.</p>
-                    <a href="/about-us" class="feature-link">
+                    <a href="<?php echo esc_url(home_url('/about-us/')); ?>" class="feature-link">
                         Learn More
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -130,7 +130,7 @@ get_header();
                     </div>
                     <h3>Flexible Learning</h3>
                     <p>Study at your own pace with our innovative online and blended programs designed for modern learners.</p>
-                    <a href="/services" class="feature-link">
+                    <a href="<?php echo esc_url(home_url('/services/')); ?>" class="feature-link">
                         View Options
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -147,7 +147,7 @@ get_header();
                     </div>
                     <h3>Career Focused</h3>
                     <p>Gain practical skills and knowledge that employers value, with programs aligned with industry needs.</p>
-                    <a href="/careers" class="feature-link">
+                    <a href="<?php echo esc_url(home_url('/careers/')); ?>" class="feature-link">
                         Explore Careers
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -177,7 +177,7 @@ get_header();
                     <div class="programme-icon">💼</div>
                     <h3>Business Management</h3>
                     <p>From Level 4 Diploma in Business Management to Level 7 in Leadership and Strategic Management, develop critical business and leadership skills.</p>
-                    <a href="/programs-qualifications/#business" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#business'); ?>" class="programme-link">
                         Explore Business Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -193,7 +193,7 @@ get_header();
                     <div class="programme-icon">👥</div>
                     <h3>Human Resource Management</h3>
                     <p>Build a career in HR from the ground up with diplomas leading to a Level 7 Postgraduate Certificate in Human Resources Management.</p>
-                    <a href="/programs-qualifications/#hr" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#hr'); ?>" class="programme-link">
                         Explore HR Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -209,7 +209,7 @@ get_header();
                     <div class="programme-icon">💻</div>
                     <h3>Information Technology</h3>
                     <p>Comprehensive IT programs including Cyber Security, Web Design, Networking, and E-commerce from Level 3 to Level 4 Diplomas.</p>
-                    <a href="/programs-qualifications/#it" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#it'); ?>" class="programme-link">
                         Explore IT Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -225,7 +225,7 @@ get_header();
                     <div class="programme-icon">📚</div>
                     <h3>Teaching and Education</h3>
                     <p>Comprehensive programs from IAHE Level 4 Diplomas in Pre School Management to Level 7 Postgraduate Certificates in Education and Leadership.</p>
-                    <a href="/programs-qualifications/#education" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#education'); ?>" class="programme-link">
                         Explore Education Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -241,7 +241,7 @@ get_header();
                     <div class="programme-icon">👶</div>
                     <h3>Early Years Education</h3>
                     <p>Specialize in early childhood education with programs from Early Years Foundation Stage teaching to postgraduate certificates in Early Childhood Education.</p>
-                    <a href="/programs-qualifications/#early-years" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#early-years'); ?>" class="programme-link">
                         Explore Early Years Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -257,7 +257,7 @@ get_header();
                     <div class="programme-icon">📊</div>
                     <h3>Sales and Marketing</h3>
                     <p>Enhance sales and marketing prowess with a pathway from Level 4 Diploma to Level 7 PGC in Sales and Marketing Management.</p>
-                    <a href="/programs-qualifications/#sales" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#sales'); ?>" class="programme-link">
                         Explore Sales Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -273,7 +273,7 @@ get_header();
                     <div class="programme-icon">🏨</div>
                     <h3>Hospitality and Tourism</h3>
                     <p>Hospitality management diplomas from Level 4 to Level 7 PGC, including business management for the hospitality industry.</p>
-                    <a href="/programs-qualifications/#hospitality" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#hospitality'); ?>" class="programme-link">
                         Explore Hospitality Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -289,7 +289,7 @@ get_header();
                     <div class="programme-icon">💰</div>
                     <h3>Accounting and Finance</h3>
                     <p>Start with the IAHE Level 4 Diploma in Accounting and Finance for foundational knowledge in the field.</p>
-                    <a href="/programs-qualifications/#accounting" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#accounting'); ?>" class="programme-link">
                         Explore Accounting Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -305,7 +305,7 @@ get_header();
                     <div class="programme-icon">🚚</div>
                     <h3>Supply Chain Management</h3>
                     <p>Dive into logistics and supply chain with Level 4 and Level 7 Diplomas, preparing for advanced roles in the field.</p>
-                    <a href="/programs-qualifications/#supply-chain" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#supply-chain'); ?>" class="programme-link">
                         Explore Supply Chain Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -321,7 +321,7 @@ get_header();
                     <div class="programme-icon">🏥</div>
                     <h3>Health and Social Care</h3>
                     <p>Comprehensive care programs from nursing assistant diplomas to Level 7 Diplomas in Health & Social Care Management.</p>
-                    <a href="/programs-qualifications/#health" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#health'); ?>" class="programme-link">
                         Explore Health Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -337,7 +337,7 @@ get_header();
                     <div class="programme-icon">🧠</div>
                     <h3>Psychology</h3>
                     <p>Delve into psychology with diplomas ranging from guidance and counselling to Level 7 PGC in Clinical Psychology.</p>
-                    <a href="/programs-qualifications/#psychology" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#psychology'); ?>" class="programme-link">
                         Explore Psychology Programs
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -353,7 +353,7 @@ get_header();
                     <div class="programme-icon">🌟</div>
                     <h3>Special Education</h3>
                     <p>Specialize with diplomas and a Professional Certification in Therapeutic Play Practitioner, focusing on inclusive education from Level 4 to Level 7.</p>
-                    <a href="/programs-qualifications/#special-education" class="programme-link">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/') . '#special-education'); ?>" class="programme-link">
                         Explore Special Education
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -458,13 +458,13 @@ get_header();
                     Join thousands of successful students who have transformed their careers with IAHS. Take the first step towards your educational goals today.
                 </p>
                 <div class="cta-buttons">
-                    <a href="/programs-qualifications" class="et_pb_button btn-primary-modern">
+                    <a href="<?php echo esc_url(home_url('/programs-qualifications/')); ?>" class="et_pb_button btn-primary-modern">
                         <span>View All Programs</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
-                    <a href="/contact" class="et_pb_button btn-secondary-modern">
+                    <a href="<?php echo esc_url(home_url('/contact/')); ?>" class="et_pb_button btn-secondary-modern">
                         <span>Get Free Consultation</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <path d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2C16.75 2 21 6.25 21 11.5Z" stroke="currentColor" stroke-width="1.5"/>
