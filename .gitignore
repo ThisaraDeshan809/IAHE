@@ -1,0 +1,72 @@
+# WordPress credentials
+/wp-config.php
+/wp-config-*.php
+/.env
+/.env.*
+/.htaccess*
+
+# Private hosting files
+/.private/
+/certificates/
+/.tmb/
+
+# WordPress media and generated files
+/wp-content/uploads/
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/ai1wm-backups/
+/wp-content/updraft/
+/wp-content/backups/
+/wp-content/wflogs/
+
+# Backups and database exports
+*.sql
+*.sql.gz
+*.zip
+*.tar
+*.tar.gz
+*.bak
+*.log
+
+# Development dependencies
+node_modules/
+vendor/
+
+# OS files
+.DS_Store
+Thumbs.db# WordPress credentials
+/wp-config.php
+/wp-config-*.php
+/.env
+/.env.*
+/.htaccess*
+
+# Private files
+/certificates/
+/.private/
+/.tmb/
+
+# WordPress backups and generated content
+/wp-content/ai1wm-backups/
+/wp-content/uploads/
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/updraft/
+/wp-content/backups/
+/wp-content/wflogs/
+
+# Database and backup files
+*.wpress
+*.sql
+*.sql.gz
+*.zip
+*.tar
+*.tar.gz
+*.bak
+*.log
+
+# Development files
+node_modules/
+vendor/
+.DS_Store
+Thumbs.db

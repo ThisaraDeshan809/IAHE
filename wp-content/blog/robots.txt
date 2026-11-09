@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+sitemap: https://iahe.co.uk/wp-content/blog/sitemap.xml
