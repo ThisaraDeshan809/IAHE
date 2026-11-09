@@ -1,4 +1,4 @@
-# WordPress credentials
+# WordPress credentials and host-specific configuration
 /wp-config.php
 /wp-config-*.php
 /.env
@@ -6,47 +6,11 @@
 /.htaccess*
 
 # Private hosting files
-/.private/
-/certificates/
-/.tmb/
-
-# WordPress media and generated files
-/wp-content/uploads/
-/wp-content/cache/
-/wp-content/upgrade/
-/wp-content/ai1wm-backups/
-/wp-content/updraft/
-/wp-content/backups/
-/wp-content/wflogs/
-
-# Backups and database exports
-*.sql
-*.sql.gz
-*.zip
-*.tar
-*.tar.gz
-*.bak
-*.log
-
-# Development dependencies
-node_modules/
-vendor/
-
-# OS files
-.DS_Store
-Thumbs.db# WordPress credentials
-/wp-config.php
-/wp-config-*.php
-/.env
-/.env.*
-/.htaccess*
-
-# Private files
 /certificates/
 /.private/
 /.tmb/
 
-# WordPress backups and generated content
+# WordPress media, backups, logs, and generated content
 /wp-content/ai1wm-backups/
 /wp-content/uploads/
 /wp-content/cache/
@@ -55,7 +19,7 @@ Thumbs.db# WordPress credentials
 /wp-content/backups/
 /wp-content/wflogs/
 
-# Database and backup files
+# Database exports and archives (licensed plugin ZIPs must stay outside Git)
 *.wpress
 *.sql
 *.sql.gz
@@ -65,8 +29,11 @@ Thumbs.db# WordPress credentials
 *.bak
 *.log
 
-# Development files
-node_modules/
-vendor/
+# Root development dependencies only. Do not globally ignore vendor/ because
+# distributable WordPress plugins contain required runtime code there.
+/node_modules/
+/vendor/
+
+# OS/editor files
 .DS_Store
 Thumbs.db

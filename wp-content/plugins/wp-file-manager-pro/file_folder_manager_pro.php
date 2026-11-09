@@ -1071,7 +1071,9 @@ if (!class_exists('mk_file_folder_manager')):
                     $settings = get_option( 'wp_filemanager_options' );
                     $fm_user_roles = (isset($settings['fm_user_roles']) && !empty($settings['fm_user_roles'])) ? $settings['fm_user_roles'] : [];
                     $user_role = $user->roles;
-                    $authorized = !empty(array_filter($fm_user_roles, fn($value) => in_array($value, $user_role)));
+                    $authorized = !empty(array_filter($fm_user_roles, function ($value) use ($user_role) {
+                        return in_array($value, $user_role, true);
+                    }));
                 }
                 
                 foreach ($user->roles as $role):
