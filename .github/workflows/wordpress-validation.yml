@@ -1,0 +1,31 @@
+name: WordPress validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - name: Validate scripts
+        run: bash -n scripts/*.sh
+      - name: Lint affected PHP entry points
+        run: |
+          php -l wp-content/themes/divi-child-iahs/functions.php
+          php -l wp-content/plugins/wp-file-manager-pro/file_folder_manager_pro.php
+          php -l wp-content/plugins/health-check/HealthCheck/class-health-check.php
+      - name: Verify predeployment guard rejects this source-only checkout
+        run: |
+          if scripts/check-plugin-integrity.sh; then
+            echo 'Source checkout unexpectedly contains distributable plugin dependencies.' >&2
+            exit 1
+          fi
