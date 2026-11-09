@@ -6,6 +6,12 @@ The Git checkout is **source-only**, not a deployable WordPress tree. A duplicat
 global `vendor/` ignore rule removed runtime files bundled in official plugin
 distributions. Never activate the affected repository copies.
 
+Release assembly supports two explicit profiles. `full` requires the approved
+licensed WP File Manager Pro package. `without-premium` omits that plugin
+entirely and is valid only after an administrator deactivates it on the target
+site. Both profiles still require complete official packages for All-in-One WP
+Migration, Wordfence, Yoast, and Site Kit.
+
 | Component | Repository version | Requirements | Finding and disposition |
 |---|---:|---|---|
 | All-in-One WP Migration | 7.95 | WP 3.3+, PHP 5.3+ | `Bandar.php` and the rest of `lib/vendor` are absent. Replace the whole directory with the official 7.95 package during release assembly. Preserve `wp-content/ai1wm-backups` separately. |

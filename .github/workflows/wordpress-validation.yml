@@ -31,6 +31,9 @@ jobs:
         run: php scripts/test-wp-file-manager-bootstrap.php
       - name: Test release integrity policy
         run: scripts/test-release-integrity.sh
+      - name: Test full and recovery release assembly
+        if: matrix.php == '8.3'
+        run: scripts/test-release-assembly.sh
       - name: Reject committed secrets and backups
         run: |
           if git ls-files | grep -E '(^|/)(wp-config.*\.php|\.env($|\.)|.*\.(sql|sql\.gz|wpress))$'; then
