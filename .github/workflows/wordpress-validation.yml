@@ -23,9 +23,17 @@ jobs:
           php -l wp-content/themes/divi-child-iahs/functions.php
           php -l wp-content/plugins/wp-file-manager-pro/file_folder_manager_pro.php
           php -l wp-content/plugins/health-check/HealthCheck/class-health-check.php
-      - name: Verify predeployment guard rejects this source-only checkout
+          php -l scripts/test-health-check-hooks.php
+          php -l scripts/test-wp-file-manager-bootstrap.php
+      - name: Test Health Check initialization order
+        run: php scripts/test-health-check-hooks.php
+      - name: Test WP File Manager bootstrap paths
+        run: php scripts/test-wp-file-manager-bootstrap.php
+      - name: Test release integrity policy
+        run: scripts/test-release-integrity.sh
+      - name: Reject committed secrets and backups
         run: |
-          if scripts/check-plugin-integrity.sh; then
-            echo 'Source checkout unexpectedly contains distributable plugin dependencies.' >&2
+          if git ls-files | grep -E '(^|/)(wp-config.*\.php|\.env($|\.)|.*\.(sql|sql\.gz|wpress))$'; then
+            echo 'A forbidden configuration, credential, or backup file is tracked.' >&2
             exit 1
           fi

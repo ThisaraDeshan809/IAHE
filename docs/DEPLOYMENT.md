@@ -3,18 +3,26 @@
 ## Build a complete release
 
 This repository must not be uploaded directly. Obtain the licensed WP File
-Manager Pro 8.4.3 ZIP from the account owner and keep it outside Git. Then run:
+Manager Pro 8.4.3 ZIP from the account owner and keep it outside Git. Record the
+SHA-256 received through the approved package handoff, then run:
 
 ```bash
 WP_FILE_MANAGER_PRO_ZIP=/secure/wp-file-manager-pro-8.4.3.zip \
+WP_FILE_MANAGER_PRO_SHA256=approved_64_character_sha256 \
   scripts/assemble-release.sh /absolute/path/iahe-release
 ```
 
 The assembler downloads version-pinned official WordPress.org packages for
 All-in-One WP Migration, Wordfence, Yoast, and Site Kit; replaces the incomplete source
-directories, and runs `scripts/check-plugin-integrity.sh`. A missing licensed ZIP
-or runtime file stops the build. Re-run the integrity check immediately before
-uploading. Do not commit the assembled plugin directories or premium archive.
+directories, verifies archive structure and declared versions, records package
+hashes in `PLUGIN-PACKAGE-SHA256SUMS.txt`, and runs
+`scripts/check-plugin-integrity.sh`. The checker executes all three generated
+Site Kit maps to require array results and verifies WP File Manager Pro's update,
+backup, and restore class files plus safe absolute update-class loading. A bad
+ZIP, hash mismatch, unsafe premium package, version mismatch, or missing runtime
+file stops the build. Assembly stays in a temporary directory, and the requested
+release path appears only after validation succeeds. Re-run the integrity check immediately before uploading.
+Do not commit the assembled plugin directories or premium archive.
 
 ## Staging and production procedure
 
@@ -29,6 +37,9 @@ uploading. Do not commit the assembled plugin directories or premium archive.
 4. Run the integrity check against the assembled release. Keep WP File Manager
    Pro disabled unless the licensed package and administrator-only access are
    verified.
+   If the package still contains relative `classes/updates.php` or
+   `classes/common-functions.php` includes, request a corrected vendor package;
+   do not bypass the release gate.
 5. Upload changed application files atomically. Exclude `wp-config.php`,
    `wp-content/uploads`, backups, caches, logs, `.user.ini`, and WAF bootstrap
    unless a reviewed Wordfence path change is intentional.
@@ -46,6 +57,12 @@ uploading. Do not commit the assembled plugin directories or premium archive.
 9. Deploy the staging-approved release during the window. Clear LiteSpeed/other
    caches and PHP OPcache through supported controls. Repeat integrity, frontend,
    login, dashboard, and log checks.
+
+Before diagnosing a continuing Health Check translation warning, record a fresh
+log timestamp and inspect `wp-content/mu-plugins/health-check-troubleshooting-mode.php`.
+A stale copied MU plugin is hosting state and is not updated merely by replacing
+the normal plugin. Disable Troubleshooting Mode through its supported UI before
+removing an orphaned MU-plugin file.
 
 ## Rollback
 

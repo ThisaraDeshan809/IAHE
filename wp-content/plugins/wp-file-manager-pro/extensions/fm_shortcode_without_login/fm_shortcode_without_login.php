@@ -8,7 +8,7 @@ class fm_shortcode_without_login
    }
    public function wp_file_manager_without_login_view($atts){
 		$filemanagerReturn = '';
-		include('inc/shortcode.php');
+		include __DIR__ . '/inc/shortcode.php';
 		return $filemanagerReturn;
    }
    public function fm_show_auto_filemanager($content) {
@@ -35,4 +35,4 @@ function fm_shortcode_without_login_call()
 {
 	new fm_shortcode_without_login;
 }
-endif; 
+endif;
