@@ -841,6 +841,13 @@ $_old_files = array(
 	'wp-includes/js/dist/undo-manager.min.js',
 	'wp-includes/js/dist/fields.min.js',
 	'wp-includes/js/dist/fields.js',
+	// 6.9
+	'wp-includes/blocks/post-author/editor.css',
+	'wp-includes/blocks/post-author/editor.min.css',
+	'wp-includes/blocks/post-author/editor-rtl.css',
+	'wp-includes/blocks/post-author/editor-rtl.min.css',
+	'wp-includes/SimplePie/src/Decode',
+	'wp-includes/SimplePie/src/Core.php',
 );
 
 /**
@@ -1023,6 +1030,7 @@ $_new_bundled_files = array(
  * @global string[]           $_old_requests_files
  * @global string[]           $_new_bundled_files
  * @global wpdb               $wpdb                   WordPress database abstraction object.
+ * @global string             $wp_version             The WordPress version string.
  *
  * @param string $from New release unzipped path.
  * @param string $to   Path to old WordPress installation.
@@ -1223,8 +1231,9 @@ function update_core( $from, $to ) {
 	/*
 	 * Don't copy wp-content, we'll deal with that below.
 	 * We also copy version.php last so failed updates report their old version.
+	 * Never copy a wp-config.php, which could have been written to the working directory.
 	 */
-	$skip              = array( 'wp-content', 'wp-includes/version.php' );
+	$skip              = array( 'wp-content', 'wp-includes/version.php', 'wp-config.php' );
 	$check_is_writable = array();
 
 	// Check to see which files don't really need updating - only available for 3.7 and higher.

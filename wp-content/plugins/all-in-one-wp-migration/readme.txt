@@ -2,9 +2,9 @@
 Contributors: yani.iliev, bangelov, pimjitsawang
 Tags: backup, transfer, copy, move, clone
 Requires at least: 3.3
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 5.3
-Stable tag: 7.95
+Stable tag: 7.102
 License: GPLv3 or later
 
 Trusted by 60M+ sites: The gold standard for WordPress migrations, backups, and site transfers since 2013.
@@ -93,6 +93,8 @@ The plugin comes preinstalled on all Bitnami WordPress sites running on AWS, Goo
 
 [youtube http://www.youtube.com/watch?v=BpWxCeUWBOk]
 
+[youtube http://www.youtube.com/watch?v=mRp7qTFYKgs]
+
 == Installation ==
 1. All-in-One WP Migration can be installed directly through your WordPress Plugins dashboard.
 1. Click "Add New" and Search for "All-in-One WP Migration"
@@ -111,6 +113,84 @@ All-in-One WP Migration is in full compliance with General Data Protection Regul
 See our [GDPR Compliant Privacy Policy here](https://www.iubenda.com/privacy-policy/946881).
 
 == Changelog ==
+= 7.102 =
+**Added**
+
+* Clean storage folder option on backups page
+* Archive validation before listing files for improved reliability
+* Minimum required versions check
+
+**Fixed**
+
+* Offset handling in archiver for correct data processing
+* File extractor offset and file read operations
+* Missing esc_html() function call for improved security
+* FDP must-use plugin disabled to prevent plugin activation issues during import
+
+**Improved**
+
+* CSS styling alignment with schedules page
+* WordPress 6.9 compatibility
+
+= 7.101 =
+**Fixed**
+
+* File size and modification time type handling in archive for improved compatibility with PHP strict mode
+* Post revisions exclusion to properly exclude associated postmeta entries during export
+
+**Improved**
+
+* Upgraded to full Vue 3 framework for enhanced performance and reduced bundle size
+
+= 7.100 =
+**Improved**
+
+* Upgraded PHP and JavaScript dependencies to their latest versions
+
+= 7.99 =
+**Added**
+
+* Gzip compression support for file operations to improve backup file handling
+
+**Fixed**
+
+* jQuery deprecated bind() method replaced with on() for better compatibility
+* File upload security by removing stripslashes_deep on $_FILES input
+
+**Improved**
+
+* Stream operations replaced with ai1wm_write() for enhanced reliability
+* Update javascript dependencies to use latest versions
+
+= 7.98 =
+**Added**
+
+* WP_IMPORTING constant for better hosting providers compatibility
+
+**Fixed**
+
+* Stored Cross-Site Scripting vulnerability in file upload (CVE-2025-8490). Thank you WordFence and Jack Pas for reporting this. [What you need to know](https://help.servmask.com/knowledgebase/cve-2025-8490-what-you-need-to-know).
+* File upload exceptions handling for better error reporting
+
+**Improved**
+
+* PHP 8 compatibility issues in MySQLi database handler
+* File uploader refactored for enhanced security and reliability
+
+= 7.97 =
+**Added**
+
+* SQLite support in AUTO_INCREMENT check
+
+**Fixed**
+
+* Database replacement for serialized values to handle edge cases with string length validation
+
+= 7.96 =
+**Added**
+
+* Admin notice warning when AUTO_INCREMENT is missing on wp_options table
+
 = 7.95 =
 **Added**
 

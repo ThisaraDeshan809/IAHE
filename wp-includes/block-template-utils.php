@@ -331,11 +331,22 @@ function _get_block_template_file( $template_type, $slug ) {
 	);
 	foreach ( $themes as $theme_slug => $theme_dir ) {
 		$template_base_paths = get_block_theme_folders( $theme_slug );
-		$file_path           = $theme_dir . '/' . $template_base_paths[ $template_type ] . '/' . $slug . '.html';
-		if ( file_exists( $file_path ) ) {
+		$template_dir        = $theme_dir . '/' . $template_base_paths[ $template_type ];
+		$file_path           = $template_dir . '/' . $slug . '.html';
+		$template_file       = realpath( $file_path );
+		$template_root       = realpath( $template_dir );
+
+		if (
+			false !== $template_file &&
+			false !== $template_root &&
+			str_starts_with(
+				wp_normalize_path( $template_file ),
+				trailingslashit( wp_normalize_path( $template_root ) )
+			)
+		) {
 			$new_template_item = array(
 				'slug'  => $slug,
-				'path'  => $file_path,
+				'path'  => $template_file,
 				'theme' => $theme_slug,
 				'type'  => $template_type,
 			);
@@ -344,11 +355,8 @@ function _get_block_template_file( $template_type, $slug ) {
 				return _add_block_template_part_area_info( $new_template_item );
 			}
 
-			if ( 'wp_template' === $template_type ) {
-				return _add_block_template_info( $new_template_item );
-			}
-
-			return $new_template_item;
+			// If it's not a `wp_template_part`, it must be a `wp_template`.
+			return _add_block_template_info( $new_template_item );
 		}
 	}
 
@@ -440,7 +448,7 @@ function _get_block_templates_files( $template_type, $query = array() ) {
 
 			if ( 'wp_template_part' === $template_type ) {
 				$candidate = _add_block_template_part_area_info( $new_template_item );
-				if ( ! isset( $area ) || ( isset( $area ) && $area === $candidate['area'] ) ) {
+				if ( ! isset( $area ) || $area === $candidate['area'] ) {
 					$template_files[ $template_slug ] = $candidate;
 				}
 			}
@@ -1230,7 +1238,20 @@ function get_block_templates( $query = array(), $template_type = 'wp_template' )
 					return true;
 				}
 			);
-			$query_result                  = array_merge( $query_result, $matching_registered_templates );
+
+			$matching_registered_templates = array_map(
+				function ( $template ) {
+					$template->content = apply_block_hooks_to_content(
+						$template->content,
+						$template,
+						'insert_hooked_blocks_and_set_ignored_hooked_blocks_metadata'
+					);
+					return $template;
+				},
+				$matching_registered_templates
+			);
+
+			$query_result = array_merge( $query_result, $matching_registered_templates );
 		}
 	}
 
@@ -1326,9 +1347,10 @@ function get_block_template( $id, $template_type = 'wp_template' ) {
 }
 
 /**
- * Retrieves a unified template object based on a theme file.
+ * Retrieves a unified template object based on a theme file or plugin registration.
  *
  * This is a fallback of get_block_template(), used when no templates are found in the database.
+ * Also checks for templates registered via the Template Registration API.
  *
  * @since 5.9.0
  *
@@ -1373,6 +1395,14 @@ function get_block_file_template( $id, $template_type = 'wp_template' ) {
 	}
 
 	$block_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $slug );
+
+	if ( $block_template ) {
+		$block_template->content = apply_block_hooks_to_content(
+			$block_template->content,
+			$block_template,
+			'insert_hooked_blocks_and_set_ignored_hooked_blocks_metadata'
+		);
+	}
 
 	/**
 	 * Filters the block template object after it has been (potentially) fetched from the theme file.

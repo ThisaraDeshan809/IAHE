@@ -32,6 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Ai1wm_Export_Database {
 
 	public static function execute( $params ) {
+
 		// Set exclude database
 		if ( isset( $params['options']['no_database'] ) ) {
 			return $params;
@@ -102,7 +103,8 @@ class Ai1wm_Export_Database {
 
 		// Exclude post revisions
 		if ( isset( $params['options']['no_post_revisions'] ) ) {
-			$db_client->set_table_where_query( ai1wm_table_prefix() . 'posts', "`post_type` != 'revision'" );
+			$db_client->set_table_where_query( ai1wm_table_prefix() . 'posts', "`post_type` != 'revision'" )
+				->set_table_where_query( ai1wm_table_prefix() . 'postmeta', sprintf( "`post_id` IN ( SELECT `ID` FROM `%s` WHERE `post_type` != 'revision' )", ai1wm_table_prefix() . 'posts' ) );
 		}
 
 		$old_table_prefixes = $old_column_prefixes = array();

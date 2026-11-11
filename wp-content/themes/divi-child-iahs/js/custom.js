@@ -1,24 +1,39 @@
 (function($) {
     'use strict';
 
-    class IAHSModern {
+    class IAHSModernMobile {
         constructor() {
             this.currentSlide = 0;
             this.slideInterval = null;
+            this.isMobile = window.innerWidth < 768;
             this.init();
         }
 
         init() {
             this.smoothScroll();
             this.animateOnScroll();
-            this.contactForm();
+            this.initCarousel();
             this.statsCounter();
             this.navigation();
             this.initializeAnimations();
             this.parallaxEffects();
-            this.formEnhancements();
-            this.initCarousel();
-            this.galleryLightbox();
+            this.handleResize();
+        }
+
+        handleResize() {
+            $(window).on('resize', () => {
+                this.isMobile = window.innerWidth < 768;
+                this.adjustLayoutForMobile();
+            });
+        }
+
+        adjustLayoutForMobile() {
+            // Adjust carousel for mobile
+            if (this.isMobile) {
+                $('.carousel-dots').css('bottom', '30px');
+            } else {
+                $('.carousel-dots').css('bottom', '40px');
+            }
         }
 
         smoothScroll() {
@@ -30,8 +45,8 @@
                 const target = $(this.getAttribute('href'));
                 if (target.length) {
                     $('html, body').animate({
-                        scrollTop: target.offset().top - 100
-                    }, 1000, 'easeInOutCubic');
+                        scrollTop: target.offset().top - 80
+                    }, 800, 'easeInOutCubic');
                 }
             });
         }
@@ -52,7 +67,8 @@
                 });
 
                 // Observe elements with delay
-                $('.feature-card, .programme-card, .testimonial-card, .recognition-feature, .gallery-item').each(function(index) {
+                $('.feature-card, .programme-card, .recognition-feature').each(function(index) {
+                    $(this).css('animation-delay', `${index * 0.1}s`);
                     observer.observe(this);
                 });
             }
@@ -98,14 +114,16 @@
             // Start the carousel
             this.startCarousel();
 
-            // Pause on hover
-            $('.hero-image-carousel').on('mouseenter', () => {
-                clearInterval(this.slideInterval);
-            }).on('mouseleave', () => {
-                this.startCarousel();
-            });
+            // Pause on hover (desktop only)
+            if (!this.isMobile) {
+                $('.hero-image-carousel').on('mouseenter', () => {
+                    clearInterval(this.slideInterval);
+                }).on('mouseleave', () => {
+                    this.startCarousel();
+                });
+            }
 
-            // Touch swipe support
+            // Touch swipe support for mobile
             this.initTouchSwipe();
         }
 
@@ -113,6 +131,8 @@
             let startX = 0;
             let endX = 0;
             const carousel = $('.hero-image-carousel')[0];
+
+            if (!carousel) return;
 
             carousel.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
@@ -143,165 +163,6 @@
             this.startCarousel();
         }
 
-        galleryLightbox() {
-            // Simple lightbox functionality
-            $('.gallery-item').on('click', function() {
-                const imgSrc = $(this).find('img').attr('src');
-                const imgAlt = $(this).find('img').attr('alt');
-                
-                // Create lightbox
-                const lightbox = $(`
-                    <div class="lightbox-overlay">
-                        <div class="lightbox-content">
-                            <img src="${imgSrc}" alt="${imgAlt}">
-                            <button class="lightbox-close">&times;</button>
-                        </div>
-                    </div>
-                `);
-                
-                $('body').append(lightbox);
-                
-                // Close lightbox
-                lightbox.on('click', function(e) {
-                    if (e.target === this || $(e.target).hasClass('lightbox-close')) {
-                        $(this).remove();
-                    }
-                });
-                
-                // ESC key to close
-                $(document).on('keyup', function(e) {
-                    if (e.key === 'Escape') {
-                        $('.lightbox-overlay').remove();
-                    }
-                });
-            });
-        }
-
-        contactForm() {
-            $('#iahs-contact-form').on('submit', (e) => {
-                e.preventDefault();
-                
-                const form = $(e.target);
-                const submitBtn = form.find('.btn-submit-modern');
-                const formData = new FormData(form[0]);
-                
-                // Add nonce
-                formData.append('nonce', iahs_ajax.nonce);
-                formData.append('action', 'iahs_contact_form');
-                
-                // Validate form
-                if (!this.validateForm(form)) {
-                    return;
-                }
-                
-                // Show loading state
-                submitBtn.addClass('btn-loading loading');
-                submitBtn.find('span').text('Sending...');
-                
-                $.ajax({
-                    url: iahs_ajax.ajax_url,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: (response) => {
-                        if (response.success) {
-                            this.showMessage('success', response.data.message);
-                            form[0].reset();
-                            this.animateSuccess(form);
-                        } else {
-                            this.showMessage('error', 'Something went wrong. Please try again.');
-                        }
-                    },
-                    error: () => {
-                        this.showMessage('error', 'Network error. Please try again.');
-                    },
-                    complete: () => {
-                        submitBtn.removeClass('btn-loading loading');
-                        submitBtn.find('span').text('Send Message');
-                    }
-                });
-            });
-        }
-
-        validateForm(form) {
-            let isValid = true;
-            const inputs = form.find('input[required], select[required], textarea[required]');
-            
-            inputs.each(function() {
-                const input = $(this);
-                if (!input.val().trim()) {
-                    input.addClass('error');
-                    this.showMessage('error', 'Please fill in all required fields.');
-                    isValid = false;
-                } else {
-                    input.removeClass('error');
-                }
-                
-                // Email validation
-                if (input.attr('type') === 'email' && input.val().trim()) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(input.val())) {
-                        input.addClass('error');
-                        this.showMessage('error', 'Please enter a valid email address.');
-                        isValid = false;
-                    }
-                }
-            });
-            
-            return isValid;
-        }
-
-        animateSuccess(form) {
-            form.addClass('success');
-            setTimeout(() => {
-                form.removeClass('success');
-            }, 3000);
-        }
-
-        showMessage(type, message) {
-            // Remove existing messages
-            $('.message-notification').remove();
-            
-            const messageEl = $(`<div class="message-notification message-${type}">${message}</div>`);
-            $('body').append(messageEl);
-            
-            // Style the message
-            messageEl.css({
-                'position': 'fixed',
-                'top': '30px',
-                'right': '30px',
-                'padding': '16px 24px',
-                'border-radius': '12px',
-                'color': '#fff',
-                'font-weight': '600',
-                'z-index': '10000',
-                'max-width': '400px',
-                'box-shadow': 'var(--shadow-xl)',
-                'backdrop-filter': 'blur(20px)',
-                'border': '1px solid rgba(255,255,255,0.2)',
-                'transform': 'translateX(100%)',
-                'transition': 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
-            });
-            
-            if (type === 'success') {
-                messageEl.css('background', 'linear-gradient(135deg, var(--success-color), #059669)');
-            } else {
-                messageEl.css('background', 'linear-gradient(135deg, var(--error-color), #dc2626)');
-            }
-            
-            // Animate in
-            setTimeout(() => {
-                messageEl.css('transform', 'translateX(0)');
-            }, 100);
-            
-            // Animate out and remove
-            setTimeout(() => {
-                messageEl.css('transform', 'translateX(100%)');
-                setTimeout(() => messageEl.remove(), 500);
-            }, 5000);
-        }
-
         statsCounter() {
             // Animate statistics counters
             if ('IntersectionObserver' in window) {
@@ -323,7 +184,7 @@
         animateNumbers(element) {
             const $el = $(element);
             const finalValue = this.parseNumber($el.text());
-            const duration = 2500;
+            const duration = 2000;
             const startTime = performance.now();
             
             const animate = (currentTime) => {
@@ -383,29 +244,12 @@
 
         parallaxEffects() {
             // Simple parallax for hero section
-            $(window).on('scroll', () => {
-                const scrolled = $(window).scrollTop();
-                $('.hero-pattern').css('transform', `translateY(${scrolled * 0.5}px)`);
-            });
-        }
-
-        formEnhancements() {
-            // Add focus effects to form elements
-            $('.form-control').on('focus', function() {
-                $(this).parent().addClass('focused');
-            }).on('blur', function() {
-                if (!$(this).val()) {
-                    $(this).parent().removeClass('focused');
-                }
-            });
-
-            // Real-time validation
-            $('.form-control').on('input', function() {
-                const $this = $(this);
-                if ($this.val().trim()) {
-                    $this.removeClass('error');
-                }
-            });
+            if (!this.isMobile) {
+                $(window).on('scroll', () => {
+                    const scrolled = $(window).scrollTop();
+                    $('.hero-pattern').css('transform', `translateY(${scrolled * 0.5}px)`);
+                });
+            }
         }
 
         initializeAnimations() {
@@ -460,39 +304,36 @@
             });
 
             // Section animations with scroll trigger
-            gsap.utils.toArray('.feature-card, .programme-card, .testimonial-card, .recognition-feature, .gallery-item').forEach((card, i) => {
-                gsap.from(card, {
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top 80%",
-                        end: "bottom 20%",
-                        toggleActions: "play none none reverse"
-                    },
-                    y: 60,
-                    opacity: 0,
-                    duration: 1,
-                    delay: i * 0.1,
-                    ease: "power3.out"
+            if (!this.isMobile) {
+                gsap.utils.toArray('.feature-card, .programme-card, .recognition-feature').forEach((card, i) => {
+                    gsap.from(card, {
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 80%",
+                            end: "bottom 20%",
+                            toggleActions: "play none none reverse"
+                        },
+                        y: 60,
+                        opacity: 0,
+                        duration: 1,
+                        delay: i * 0.1,
+                        ease: "power3.out"
+                    });
                 });
-            });
+            }
         }
     }
 
     // Initialize when document is ready
     $(document).ready(() => {
-        new IAHSModern();
+        new IAHSModernMobile();
     });
 
     // Initialize when Divi page is fully loaded
     $(window).on('et_pb_after_init_modules', () => {
         setTimeout(() => {
-            new IAHSModern();
+            new IAHSModernMobile();
         }, 100);
-    });
-
-    // Handle page transitions
-    $(window).on('beforeunload', () => {
-        $('body').addClass('page-transition');
     });
 
 })(jQuery);

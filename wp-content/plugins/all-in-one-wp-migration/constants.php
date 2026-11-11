@@ -37,7 +37,7 @@ define( 'AI1WM_DEBUG', false );
 // ==================
 // = Plugin Version =
 // ==================
-define( 'AI1WM_VERSION', '7.95' );
+define( 'AI1WM_VERSION', '7.102' );
 
 // ===============
 // = Plugin Name =
@@ -73,16 +73,6 @@ define( 'AI1WM_CONTROLLER_PATH', AI1WM_LIB_PATH . DIRECTORY_SEPARATOR . 'control
 // = Model Path =
 // ==============
 define( 'AI1WM_MODEL_PATH', AI1WM_LIB_PATH . DIRECTORY_SEPARATOR . 'model' );
-
-// ===============
-// = Export Path =
-// ===============
-define( 'AI1WM_EXPORT_PATH', AI1WM_MODEL_PATH . DIRECTORY_SEPARATOR . 'export' );
-
-// ===============
-// = Import Path =
-// ===============
-define( 'AI1WM_IMPORT_PATH', AI1WM_MODEL_PATH . DIRECTORY_SEPARATOR . 'import' );
 
 // =============
 // = View Path =
@@ -298,6 +288,11 @@ define( 'AI1WM_WP_ENGINE_SECURITY_AUDITOR_NAME', 'wpengine-security-auditor.php'
 // = WP Cerber Security Name =
 // ===========================
 define( 'AI1WM_WP_CERBER_SECURITY_NAME', 'aaa-wp-cerber.php' );
+
+// =============================
+// = EOS Deactivate Plugins Name
+// =============================
+define( 'AI1WM_EOS_DEACTIVATE_PLUGINS_NAME', 'eos-deactivate-plugins.php' );
 
 // ===============================
 // = W3TC config file to exclude =
@@ -521,6 +516,16 @@ define( 'AI1WM_STORAGE_INDEX_PHP', AI1WM_STORAGE_PATH . DIRECTORY_SEPARATOR . 'i
 // = Storage index.html File =
 // ===========================
 define( 'AI1WM_STORAGE_INDEX_HTML', AI1WM_STORAGE_PATH . DIRECTORY_SEPARATOR . 'index.html' );
+
+// ==========================
+// = Storage .htaccess File =
+// ==========================
+define( 'AI1WM_STORAGE_HTACCESS', AI1WM_STORAGE_PATH . DIRECTORY_SEPARATOR . '.htaccess' );
+
+// ===========================
+// = Storage web.config File =
+// ===========================
+define( 'AI1WM_STORAGE_WEBCONFIG', AI1WM_STORAGE_PATH . DIRECTORY_SEPARATOR . 'web.config' );
 
 // ==========================
 // = Backups index.php File =

@@ -854,6 +854,8 @@ var tb_pathToImage = "<?php echo esc_js( includes_url( 'js/thickbox/loadingAnima
 }
 
 /**
+ * @since 3.0.0
+ *
  * @param array $users
  * @return bool
  */
@@ -876,7 +878,7 @@ function confirm_delete_users( $users ) {
 	<?php
 	wp_nonce_field( 'ms-users-delete' );
 	$site_admins = get_super_admins();
-	$admin_out   = '<option value="' . esc_attr( $current_user->ID ) . '">' . $current_user->user_login . '</option>';
+	$admin_out   = '<option value="' . esc_attr( $current_user->ID ) . '">' . esc_html( $current_user->user_login ) . '</option>';
 	?>
 	<table class="form-table" role="presentation">
 	<?php
@@ -890,7 +892,7 @@ function confirm_delete_users( $users ) {
 					sprintf(
 						/* translators: %s: User login. */
 						__( 'Warning! User %s cannot be deleted.' ),
-						$delete_user->user_login
+						esc_html( $delete_user->user_login )
 					)
 				);
 			}
@@ -900,13 +902,13 @@ function confirm_delete_users( $users ) {
 					sprintf(
 						/* translators: %s: User login. */
 						__( 'Warning! User cannot be deleted. The user %s is a network administrator.' ),
-						'<em>' . $delete_user->user_login . '</em>'
+						'<em>' . esc_html( $delete_user->user_login ) . '</em>'
 					)
 				);
 			}
 			?>
 			<tr>
-				<th scope="row"><?php echo $delete_user->user_login; ?>
+				<th scope="row"><?php echo esc_html( $delete_user->user_login ); ?>
 					<?php echo '<input type="hidden" name="user[]" value="' . esc_attr( $user_id ) . '" />' . "\n"; ?>
 				</th>
 			<?php
@@ -919,7 +921,7 @@ function confirm_delete_users( $users ) {
 				printf(
 					/* translators: %s: User login. */
 					__( 'What should be done with content owned by %s?' ),
-					'<em>' . $delete_user->user_login . '</em>'
+					'<em>' . esc_html( $delete_user->user_login ) . '</em>'
 				);
 				?>
 				</legend></p>
@@ -943,7 +945,7 @@ function confirm_delete_users( $users ) {
 
 						foreach ( $blog_users as $user ) {
 							if ( ! in_array( (int) $user->ID, $allusers, true ) ) {
-								$user_list .= "<option value='{$user->ID}'>{$user->user_login}</option>";
+								$user_list .= "<option value='{$user->ID}'>" . esc_html( $user->user_login ) . '</option>';
 							}
 						}
 

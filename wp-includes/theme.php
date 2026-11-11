@@ -1002,7 +1002,20 @@ function validate_theme_requirements( $stylesheet ) {
 		);
 	}
 
-	return true;
+	/**
+	 * Filters the theme requirement validation response.
+	 *
+	 * If a theme fails due to a Core-provided validation (incompatible WP, PHP versions), this
+	 * filter will not fire. A WP_Error response will already be returned.
+	 *
+	 * This filter is intended to add additional validation steps by site administrators.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param bool|WP_Error $met_requirements True if the theme meets requirements, WP_Error if not.
+	 * @param string $stylesheet Directory name for the theme.
+	 */
+	return apply_filters( 'validate_theme_requirements', true, $stylesheet );
 }
 
 /**
@@ -1500,7 +1513,6 @@ function header_image() {
 function get_uploaded_header_images() {
 	$header_images = array();
 
-	// @todo Caching.
 	$headers = get_posts(
 		array(
 			'post_type'  => 'attachment',
@@ -1547,6 +1559,7 @@ function get_uploaded_header_images() {
  * Gets the header image data.
  *
  * @since 3.4.0
+ * @since 7.1.1 The `width` and `height` are cast to non-negative integers.
  *
  * @global array $_wp_default_headers
  *
@@ -1585,7 +1598,14 @@ function get_custom_header() {
 		'height'        => get_theme_support( 'custom-header', 'height' ),
 		'video'         => get_theme_support( 'custom-header', 'video' ),
 	);
-	return (object) wp_parse_args( $data, $default );
+
+	if ( ! is_array( $data ) && ! is_object( $data ) ) {
+		$data = array();
+	}
+	$header         = (object) wp_parse_args( $data, $default );
+	$header->width  = absint( $header->width );
+	$header->height = absint( $header->height );
+	return $header;
 }
 
 /**
@@ -3748,7 +3768,7 @@ function _wp_customize_loader_settings() {
 		),
 	);
 
-	$script = 'var _wpCustomizeLoaderSettings = ' . wp_json_encode( $settings ) . ';';
+	$script = 'var _wpCustomizeLoaderSettings = ' . wp_json_encode( $settings, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';';
 
 	$wp_scripts = wp_scripts();
 	$data       = $wp_scripts->get_data( 'customize-loader', 'data' );
@@ -3771,7 +3791,7 @@ function _wp_customize_loader_settings() {
 function wp_customize_url( $stylesheet = '' ) {
 	$url = admin_url( 'customize.php' );
 	if ( $stylesheet ) {
-		$url .= '?theme=' . urlencode( $stylesheet );
+		$url = add_query_arg( 'theme', urlencode( $stylesheet ), $url );
 	}
 	return esc_url( $url );
 }
@@ -3815,7 +3835,7 @@ function wp_customize_support_script() {
 		}());
 	</script>
 	<?php
-	wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) );
+	wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) . "\n//# sourceURL=" . rawurlencode( __FUNCTION__ ) );
 }
 
 /**
@@ -4348,6 +4368,8 @@ function create_initial_theme_features() {
  * Returns whether the active theme is a block-based theme or not.
  *
  * @since 5.9.0
+ *
+ * @global string[] $wp_theme_directories
  *
  * @return bool Whether the active theme is a block-based theme or not.
  */

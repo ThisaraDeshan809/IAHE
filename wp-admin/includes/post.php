@@ -24,6 +24,20 @@ function _wp_translate_postdata( $update = false, $post_data = null ) {
 		$post_data = &$_POST;
 	}
 
+	/*
+	 * A raw `ID` on the create path (no `post_ID`) is an attempt to overwrite an
+	 * existing post while bypassing the per-post capability checks below, which only
+	 * run on the update path. Reject it outright: legitimate post creation never
+	 * carries an `ID`.
+	 */
+	if ( ! $update && ! empty( $post_data['ID'] ) ) {
+		if ( 'page' === $post_data['post_type'] ) {
+			return new WP_Error( 'edit_others_pages', __( 'Sorry, you are not allowed to edit pages as this user.' ) );
+		} else {
+			return new WP_Error( 'edit_others_posts', __( 'Sorry, you are not allowed to edit posts as this user.' ) );
+		}
+	}
+
 	if ( $update ) {
 		$post_data['ID'] = (int) $post_data['post_ID'];
 	}
@@ -768,13 +782,20 @@ function get_default_post_to_edit( $post_type = 'post', $create_in_db = false ) 
 				'post_type'   => $post_type,
 				'post_status' => 'auto-draft',
 			),
-			false,
+			true,
 			false
 		);
-		$post    = get_post( $post_id );
+
+		if ( is_wp_error( $post_id ) ) {
+			wp_die( $post_id->get_error_message() );
+		}
+
+		$post = get_post( $post_id );
+
 		if ( current_theme_supports( 'post-formats' ) && post_type_supports( $post->post_type, 'post-formats' ) && get_option( 'default_post_format' ) ) {
 			set_post_format( $post, get_option( 'default_post_format' ) );
 		}
+
 		wp_after_insert_post( $post, false, null );
 
 		// Schedule auto-draft cleanup.
@@ -2186,7 +2207,7 @@ function wp_autosave( $post_data ) {
  *
  * @param int $post_id Optional. Post ID.
  */
-function redirect_post( $post_id = '' ) {
+function redirect_post( $post_id = 0 ) {
 	if ( isset( $_POST['save'] ) || isset( $_POST['publish'] ) ) {
 		$status = get_post_status( $post_id );
 
@@ -2442,7 +2463,7 @@ function the_block_editor_meta_boxes() {
 	 * our editor instance.
 	 */
 	$script = 'window._wpLoadBlockEditor.then( function() {
-		wp.data.dispatch( \'core/edit-post\' ).setAvailableMetaBoxesPerLocation( ' . wp_json_encode( $meta_boxes_per_location ) . ' );
+		wp.data.dispatch( \'core/edit-post\' ).setAvailableMetaBoxesPerLocation( ' . wp_json_encode( $meta_boxes_per_location, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ' );
 	} );';
 
 	wp_add_inline_script( 'wp-edit-post', $script );

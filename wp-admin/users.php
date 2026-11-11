@@ -122,7 +122,7 @@ switch ( $wp_list_table->current_action() ) {
 		$editable_roles = get_editable_roles();
 		$role           = $_REQUEST['new_role'];
 
-		// Mocking the `none` role so we are able to save it to the database
+		// Mock `none` as editable role.
 		$editable_roles['none'] = array(
 			'name' => __( '&mdash; No role for this site &mdash;' ),
 		);
@@ -162,6 +162,8 @@ switch ( $wp_list_table->current_action() ) {
 			}
 
 			$user = get_userdata( $id );
+
+			// If $role is empty, none will be set.
 			$user->set_role( $role );
 		}
 
@@ -369,7 +371,7 @@ switch ( $wp_list_table->current_action() ) {
 					/* translators: 1: User ID, 2: User login. */
 					__( 'ID #%1$s: %2$s <strong>The current user will not be deleted.</strong>' ),
 					$id,
-					$user->user_login
+					esc_html( $user->user_login )
 				);
 				echo "</li>\n";
 			} else {
@@ -382,7 +384,7 @@ switch ( $wp_list_table->current_action() ) {
 					/* translators: 1: User ID, 2: User login. */
 					__( 'ID #%1$s: %2$s' ),
 					$id,
-					$user->user_login
+					esc_html( $user->user_login )
 				);
 				echo "</li>\n";
 
@@ -536,7 +538,7 @@ switch ( $wp_list_table->current_action() ) {
 					/* translators: 1: User ID, 2: User login. */
 					__( 'ID #%1$s: %2$s <strong>Sorry, you are not allowed to remove this user.</strong>' ),
 					$id,
-					$user->user_login
+					esc_html( $user->user_login )
 				);
 				echo "</li>\n";
 			} else {
@@ -549,7 +551,7 @@ switch ( $wp_list_table->current_action() ) {
 					/* translators: 1: User ID, 2: User login. */
 					__( 'ID #%1$s: %2$s' ),
 					$id,
-					$user->user_login
+					esc_html( $user->user_login )
 				);
 				echo "</li>\n";
 

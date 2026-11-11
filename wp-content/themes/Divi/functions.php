@@ -8829,36 +8829,471 @@ function et_divi_oembed_dataparse_remove_yt_frameborder( $html, $data, $url ) {
 }
 add_filter( 'oembed_dataparse', 'et_divi_oembed_dataparse_remove_yt_frameborder', 10, 3 );
 
-function certificate_lookup_form() {
-    ob_start(); ?>
-    <div style="text-align:center; margin-top:50px;">
-        <h2>Find Your Certificate</h2>
-        <form id="certificateForm">
-            <input type="text" id="studentId" name="student_id" placeholder="Enter your Student ID" required 
-                   style="padding:8px; width:250px;">
-            <button type="submit" style="padding:8px 15px;">Get Certificate</button>
-        </form>
-        <div id="certificateViewer" style="margin-top:30px;"></div>
-    </div>
+// ====================
+// IAHS CERTIFICATE SYSTEM - EMBEDDED VIEWER
+// ====================
 
-    <script>
-    document.getElementById('certificateForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let studentId = document.getElementById('studentId').value.trim();
-        if (!studentId) return alert('Please enter a student ID');
-
-        let viewerDiv = document.getElementById('certificateViewer');
-        let pdfUrl = `https://www.iahe.co.uk/certificates/${studentId}.pdf`;
-
-        // Show the PDF viewer iframe
-        viewerDiv.innerHTML = `
-            <iframe src="https://docs.google.com/gview?url=${pdfUrl}&embedded=true" 
-                    width="100%" height="600px" style="border:none;"></iframe>
-        `;
-    });
-    </script>
-    <?php
-    return ob_get_clean();
+// Certificate Access Handler - Embedded Viewer
+function iahs_certificate_access() {
+    if (isset($_GET['student_id']) && !empty($_GET['student_id'])) {
+        $student_id = sanitize_text_field($_GET['student_id']);
+        
+        // Clean and validate student ID
+        $student_id = preg_replace('/[^A-Za-z0-9_-]/', '', $student_id);
+        
+        if (!empty($student_id)) {
+            $certificate_path = ABSPATH . "certificates/{$student_id}.pdf";
+            
+            // Check if certificate exists
+            if (file_exists($certificate_path)) {
+                // Display PDF in canvas viewer
+                return iahs_display_pdf_embedded($certificate_path, $student_id);
+            } else {
+                // Set error flag
+                set_transient('certificate_error', $student_id, 30);
+                wp_redirect(home_url('/certificate-access/?error=not_found'));
+                exit;
+            }
+        }
+    }
 }
-add_shortcode('certificate_lookup', 'certificate_lookup_form');
+add_action('template_redirect', 'iahs_certificate_access');
+
+function iahs_display_pdf_embedded($file_path, $student_id) {
+    if (!file_exists($file_path)) {
+        return false;
+    }
+    
+    // Get PDF content and convert to base64
+    $pdf_content = file_get_contents($file_path);
+    $pdf_base64 = base64_encode($pdf_content);
+    
+    ?>
+    <!DOCTYPE html>
+    <html <?php language_attributes(); ?>>
+    <head>
+        <meta charset="<?php bloginfo('charset'); ?>">
+        <title>Certificate - <?php echo esc_html($student_id); ?> | International Academy for Higher Studies</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Include PDF.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Arial', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+            
+            .certificate-wrapper {
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                overflow: hidden;
+                max-width: 1200px;
+                width: 100%;
+            }
+            
+            .certificate-header {
+                background: linear-gradient(135deg, #2d5c8a 0%, #1e4163 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+            
+            .certificate-header h1 {
+                font-size: 28px;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+            
+            .certificate-header p {
+                font-size: 16px;
+                opacity: 0.9;
+            }
+            
+            .certificate-content {
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pdf-viewer-container {
+                width: 100%;
+                max-width: 800px;
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 30px;
+                border: 2px solid #e9ecef;
+            }
+            
+            #pdf-canvas {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                display: block;
+                margin: 0 auto;
+            }
+            
+            .canvas-controls {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin: 20px 0;
+                flex-wrap: wrap;
+            }
+            
+            .control-btn {
+                padding: 12px 25px;
+                border: none;
+                border-radius: 8px;
+                background: #2d5c8a;
+                color: white;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .control-btn:hover {
+                background: #1e4163;
+                transform: translateY(-2px);
+            }
+            
+            .control-btn:disabled {
+                background: #6c757d;
+                cursor: not-allowed;
+                transform: none;
+            }
+            
+            .page-info {
+                background: #e9ecef;
+                padding: 10px 20px;
+                border-radius: 20px;
+                font-weight: 600;
+                color: #495057;
+            }
+            
+            .protection-notice {
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                padding: 15px;
+                text-align: center;
+                margin-top: 20px;
+                color: #856404;
+            }
+            
+            .action-buttons {
+                display: flex;
+                gap: 15px;
+                margin-top: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .btn {
+                padding: 12px 30px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                text-decoration: none;
+                display: inline-block;
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-primary {
+                background: #2d5c8a;
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background: #1e4163;
+            }
+            
+            .watermark {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 80px;
+                color: rgba(204, 0, 0, 0.1);
+                pointer-events: none;
+                z-index: 10000;
+                white-space: nowrap;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            
+            .loading {
+                text-align: center;
+                padding: 40px;
+                color: #6c757d;
+            }
+            
+            .loading-spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #2d5c8a;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 2s linear infinite;
+                margin: 0 auto 20px;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+                body {
+                    padding: 10px;
+                }
+                
+                .certificate-content {
+                    padding: 20px;
+                }
+                
+                .pdf-viewer-container {
+                    padding: 15px;
+                }
+                
+                .certificate-header {
+                    padding: 20px;
+                }
+                
+                .certificate-header h1 {
+                    font-size: 22px;
+                }
+                
+                .canvas-controls {
+                    flex-direction: column;
+                    align-items: center;
+                }
+                
+                .control-btn {
+                    width: 100%;
+                    max-width: 200px;
+                }
+                
+                .watermark {
+                    font-size: 40px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Watermark -->
+        <div class="watermark">IAHS VERIFICATION ONLY</div>
+        
+        <div class="certificate-wrapper">
+            <div class="certificate-header">
+                <h1>Certificate Verification</h1>
+                <p>International Academy for Higher Studies - Student ID: <?php echo esc_html($student_id); ?></p>
+            </div>
+            
+            <div class="certificate-content">
+                <div class="pdf-viewer-container">
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading certificate...</p>
+                    </div>
+                    <canvas id="pdf-canvas" style="display: none;"></canvas>
+                </div>
+                
+                <div class="canvas-controls">
+                    <button class="control-btn" id="prev-page" disabled>
+                        <span>◀ Previous</span>
+                    </button>
+                    
+                    <div class="page-info">
+                        Page: <span id="page-num">1</span> / <span id="page-count">0</span>
+                    </div>
+                    
+                    <button class="control-btn" id="next-page" disabled>
+                        <span>Next ▶</span>
+                    </button>
+                </div>
+                
+                <div class="protection-notice">
+                    <strong>⚠ Protected View</strong><br>
+                    This certificate is for verification purposes only. Downloading, printing, and right-clicking are disabled.
+                </div>
+                
+                <!-- REMOVED PRINT BUTTON - Only Back to Search button remains -->
+                <div class="action-buttons">
+                    <a href="<?php echo home_url('/certificate-access/'); ?>" class="btn btn-primary">
+                        ← Back to Search
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // PDF.js configuration
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+            
+            // Protection: Disable right-click, text selection, etc.
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Disable keyboard shortcuts including print
+            document.addEventListener('keydown', function(e) {
+                // Disable Ctrl+S, Ctrl+P, Print Screen, etc.
+                if (e.ctrlKey && (e.key === 's' || e.key === 'p')) {
+                    e.preventDefault();
+                    return false;
+                }
+                if (e.key === 'F12' || e.key === 'PrintScreen') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Block print functionality
+            window.addEventListener('beforeprint', function(e) {
+                e.preventDefault();
+                alert('Printing is disabled for certificate verification.');
+                return false;
+            });
+            
+            // PDF rendering variables
+            let pdfDoc = null;
+            let pageNum = 1;
+            let pageRendering = false;
+            let pageNumPending = null;
+            const scale = 1.5;
+            
+            // Get DOM elements
+            const canvas = document.getElementById('pdf-canvas');
+            const ctx = canvas.getContext('2d');
+            const loadingElement = document.getElementById('loading');
+            
+            /**
+             * Render a specific page
+             */
+            function renderPage(num) {
+                pageRendering = true;
+                
+                pdfDoc.getPage(num).then(function(page) {
+                    const viewport = page.getViewport({ scale: scale });
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    
+                    const renderTask = page.render(renderContext);
+                    
+                    renderTask.promise.then(function() {
+                        pageRendering = false;
+                        
+                        if (pageNumPending !== null) {
+                            renderPage(pageNumPending);
+                            pageNumPending = null;
+                        }
+                        
+                        // Update page counters
+                        document.getElementById('page-num').textContent = num;
+                    });
+                });
+                
+                // Update button states
+                document.getElementById('prev-page').disabled = num <= 1;
+                document.getElementById('next-page').disabled = num >= pdfDoc.numPages;
+            }
+            
+            /**
+             * Queue page rendering if another page is currently rendering
+             */
+            function queueRenderPage(num) {
+                if (pageRendering) {
+                    pageNumPending = num;
+                } else {
+                    renderPage(num);
+                }
+            }
+            
+            /**
+             * Show previous page
+             */
+            function onPrevPage() {
+                if (pageNum <= 1) return;
+                pageNum--;
+                queueRenderPage(pageNum);
+            }
+            
+            /**
+             * Show next page
+             */
+            function onNextPage() {
+                if (pageNum >= pdfDoc.numPages) return;
+                pageNum++;
+                queueRenderPage(pageNum);
+            }
+            
+            // Event listeners for navigation
+            document.getElementById('prev-page').addEventListener('click', onPrevPage);
+            document.getElementById('next-page').addEventListener('click', onNextPage);
+            
+            // Load and display PDF
+            const loadingTask = pdfjsLib.getDocument({data: atob('<?php echo $pdf_base64; ?>')});
+            
+            loadingTask.promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page-count').textContent = pdfDoc.numPages;
+                
+                // Hide loading, show canvas
+                loadingElement.style.display = 'none';
+                canvas.style.display = 'block';
+                
+                // Enable buttons
+                document.getElementById('prev-page').disabled = false;
+                document.getElementById('next-page').disabled = false;
+                
+                // Render first page
+                renderPage(pageNum);
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                loadingElement.innerHTML = '<p style="color: #dc3545;">Error loading certificate. Please try again.</p>';
+            });
+        </script>
+    </body>
+    </html>
+    <?php
+    exit;
+}
 

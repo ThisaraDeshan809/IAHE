@@ -476,10 +476,10 @@ final class WP_Customize_Manager {
 			( function( api, settings ) {
 				var preview = new api.Messenger( settings.messengerArgs );
 				preview.send( 'iframe-loading-error', settings.error );
-			} )( wp.customize, <?php echo wp_json_encode( $settings ); ?> );
+			} )( wp.customize, <?php echo wp_json_encode( $settings, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ); ?> );
 			</script>
 			<?php
-			$message .= wp_get_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) );
+			$message .= wp_get_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) . "\n//# sourceURL=" . rawurlencode( __METHOD__ ) );
 		}
 
 		wp_die( $message );
@@ -627,7 +627,13 @@ final class WP_Customize_Manager {
 		if ( empty( $this->_changeset_uuid ) ) {
 			$changeset_uuid = null;
 
-			if ( ! $this->branching() && $this->is_theme_active() ) {
+			/**
+			 * Only users who can customize may have the latest unpublished changeset auto-loaded. Otherwise, an
+			 * unauthenticated preview request lacking a UUID could adopt another user's unpublished changeset and
+			 * disclose its state, since the UUID serves as the secret key for previewing. Unauthorized requests
+			 * get a fresh UUID instead, which matches no changeset and is rejected in {@see self::setup_theme()}.
+			 */
+			if ( ! $this->branching() && $this->is_theme_active() && current_user_can( 'customize' ) ) {
 				$unpublished_changeset_posts = $this->get_changeset_posts(
 					array(
 						'post_status'               => array_diff( get_post_stati(), array( 'auto-draft', 'publish', 'trash', 'inherit', 'private' ) ),
@@ -2105,7 +2111,7 @@ final class WP_Customize_Manager {
 		} )();
 		</script>
 		<?php
-		wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) );
+		wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) . "\n//# sourceURL=" . rawurlencode( __METHOD__ ) );
 	}
 
 	/**
@@ -2161,8 +2167,9 @@ final class WP_Customize_Manager {
 				'keepAliveSend'    => 1000,
 			),
 			'theme'             => array(
-				'stylesheet' => $this->get_stylesheet(),
-				'active'     => $this->is_theme_active(),
+				'stylesheet'   => $this->get_stylesheet(),
+				'active'       => $this->is_theme_active(),
+				'isBlockTheme' => wp_is_block_theme(),
 			),
 			'url'               => array(
 				'self'          => $self_url,
@@ -2204,7 +2211,7 @@ final class WP_Customize_Manager {
 		ob_start();
 		?>
 		<script>
-			var _wpCustomizeSettings = <?php echo wp_json_encode( $settings ); ?>;
+			var _wpCustomizeSettings = <?php echo wp_json_encode( $settings, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ); ?>;
 			_wpCustomizeSettings.values = {};
 			(function( v ) {
 				<?php
@@ -2217,8 +2224,8 @@ final class WP_Customize_Manager {
 					if ( $setting->check_capabilities() ) {
 						printf(
 							"v[%s] = %s;\n",
-							wp_json_encode( $id ),
-							wp_json_encode( $setting->js_value() )
+							wp_json_encode( $id, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+							wp_json_encode( $setting->js_value(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 						);
 					}
 				}
@@ -2226,7 +2233,7 @@ final class WP_Customize_Manager {
 			})( _wpCustomizeSettings.values );
 		</script>
 		<?php
-		wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) );
+		wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) . "\n//# sourceURL=" . rawurlencode( __METHOD__ ) );
 	}
 
 	/**
@@ -3165,27 +3172,25 @@ final class WP_Customize_Manager {
 			return;
 		}
 
-		if ( $changeset_post_id ) {
-			if ( ! current_user_can( get_post_type_object( 'customize_changeset' )->cap->delete_post, $changeset_post_id ) ) {
-				wp_send_json_error(
-					array(
-						'code'    => 'changeset_trash_unauthorized',
-						'message' => __( 'Unable to trash changes.' ),
-					)
-				);
-			}
+		if ( ! current_user_can( get_post_type_object( 'customize_changeset' )->cap->delete_post, $changeset_post_id ) ) {
+			wp_send_json_error(
+				array(
+					'code'    => 'changeset_trash_unauthorized',
+					'message' => __( 'Unable to trash changes.' ),
+				)
+			);
+		}
 
-			$lock_user = (int) wp_check_post_lock( $changeset_post_id );
+		$lock_user = (int) wp_check_post_lock( $changeset_post_id );
 
-			if ( $lock_user && get_current_user_id() !== $lock_user ) {
-				wp_send_json_error(
-					array(
-						'code'     => 'changeset_locked',
-						'message'  => __( 'Changeset is being edited by other user.' ),
-						'lockUser' => $this->get_lock_user_data( $lock_user ),
-					)
-				);
-			}
+		if ( $lock_user && get_current_user_id() !== $lock_user ) {
+			wp_send_json_error(
+				array(
+					'code'     => 'changeset_locked',
+					'message'  => __( 'Changeset is being edited by other user.' ),
+					'lockUser' => $this->get_lock_user_data( $lock_user ),
+				)
+			);
 		}
 
 		if ( 'trash' === get_post_status( $changeset_post_id ) ) {
@@ -4989,7 +4994,7 @@ final class WP_Customize_Manager {
 		ob_start();
 		?>
 		<script>
-			var _wpCustomizeSettings = <?php echo wp_json_encode( $settings ); ?>;
+			var _wpCustomizeSettings = <?php echo wp_json_encode( $settings, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ); ?>;
 			_wpCustomizeSettings.initialClientTimestamp = _.now();
 			_wpCustomizeSettings.controls = {};
 			_wpCustomizeSettings.settings = {};
@@ -5001,8 +5006,8 @@ final class WP_Customize_Manager {
 				if ( $setting->check_capabilities() ) {
 					printf(
 						"s[%s] = %s;\n",
-						wp_json_encode( $setting->id ),
-						wp_json_encode( $setting->json() )
+						wp_json_encode( $setting->id, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+						wp_json_encode( $setting->json(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 					);
 				}
 			}
@@ -5014,8 +5019,8 @@ final class WP_Customize_Manager {
 				if ( $control->check_capabilities() ) {
 					printf(
 						"c[%s] = %s;\n",
-						wp_json_encode( $control->id ),
-						wp_json_encode( $control->json() )
+						wp_json_encode( $control->id, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+						wp_json_encode( $control->json(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 					);
 				}
 			}
@@ -5023,7 +5028,7 @@ final class WP_Customize_Manager {
 			?>
 		</script>
 		<?php
-		wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) );
+		wp_print_inline_script_tag( wp_remove_surrounding_empty_script_tags( ob_get_clean() ) . "\n//# sourceURL=" . rawurlencode( __METHOD__ ) );
 	}
 
 	/**

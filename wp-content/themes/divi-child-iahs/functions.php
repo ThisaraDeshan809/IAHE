@@ -8,6 +8,25 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// =========================================================================
+// FIX: Remove unwanted output between nav and hero section
+// =========================================================================
+
+/**
+ * Fix Yoast SEO schema output issues
+ */
+add_action('wp', 'iahs_fix_yoast_output');
+function iahs_fix_yoast_output()
+{
+    // Remove Yoast schema if it's causing layout issues
+    add_filter('wpseo_json_ld_output', '__return_false');
+
+    // Alternative: Remove specific Yoast filters that might cause output
+    if (class_exists('WPSEO_Frontend')) {
+        remove_action('wpseo_head', array(WPSEO_Frontend::get_instance(), 'debug_marker'), 2);
+    }
+}
+
 /**
  * Clean up wp_head output
  */
@@ -25,18 +44,47 @@ function iahs_cleanup_head_output()
     remove_action('wp_head', 'feed_links_extra', 3);
 }
 
+/**
+ * Ensure proper template loading
+ */
+add_action('template_redirect', 'iahs_check_template_output');
+function iahs_check_template_output()
+{
+    // Check if we're on the modern home template
+    if (is_page_template('templates/home-modern.php')) {
+        // Ensure no output before header
+        ob_start();
+    }
+}
+
+/**
+ * Fix for Divi theme builder compatibility
+ */
+add_action('wp_enqueue_scripts', 'iahs_fix_divi_compatibility', 15);
+function iahs_fix_divi_compatibility()
+{
+    // Ensure Divi styles load properly
+    if (function_exists('et_setup_theme')) {
+        wp_dequeue_style('divi-style');
+        wp_enqueue_style('divi-style', get_template_directory_uri() . '/style.css', array(), ET_CORE_VERSION);
+    }
+}
+
 add_action('wp_enqueue_scripts', 'iahs_child_enqueue_styles', 20);
 function iahs_child_enqueue_styles()
 {
-    $parent_version = defined('ET_CORE_VERSION') ? ET_CORE_VERSION : wp_get_theme(get_template())->get('Version');
-    $child_version = wp_get_theme()->get('Version');
+    // First dequeue any existing Divi styles that might conflict
+    wp_dequeue_style('divi-style');
+    wp_dequeue_style('divi-style-parent');
 
-    // Divi registers this handle; enqueue it once with a safe version fallback.
-    wp_enqueue_style('divi-style', get_template_directory_uri() . '/style.css', array(), $parent_version);
+    // Enqueue parent style
+    wp_enqueue_style('divi-parent', get_template_directory_uri() . '/style.css');
 
-    wp_enqueue_style('divi-child', get_stylesheet_uri(), array('divi-style'), $child_version);
+    // Enqueue child style
+    wp_enqueue_style('divi-child', get_stylesheet_directory_uri() . '/style.css', array('divi-parent'));
 
-    wp_enqueue_style('iahs-modern-style', get_stylesheet_directory_uri() . '/css/custom.css', array('divi-child'), $child_version);
+    // Enqueue custom modern styles
+    wp_enqueue_style('iahs-modern-style', get_stylesheet_directory_uri() . '/css/custom.css', array('divi-parent'), '1.0.0');
 
     // Enqueue custom JavaScript
     wp_enqueue_script('iahs-modern-js', get_stylesheet_directory_uri() . '/js/custom.js', array('jquery'), '1.0.0', true);
@@ -73,17 +121,16 @@ add_action('wp_ajax_nopriv_iahs_contact_form', 'iahs_handle_contact_form');
 function iahs_handle_contact_form()
 {
     // Verify nonce
-    $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
-    if (!wp_verify_nonce($nonce, 'iahs_nonce')) {
+    if (!wp_verify_nonce($_POST['nonce'], 'iahs_nonce')) {
         wp_send_json_error('Security check failed');
     }
 
-    // Read optional fields without emitting notices on malformed requests.
-    $name = isset($_POST['name']) ? sanitize_text_field(wp_unslash($_POST['name'])) : '';
-    $email = isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : '';
-    $phone = isset($_POST['phone']) ? sanitize_text_field(wp_unslash($_POST['phone'])) : '';
-    $message = isset($_POST['message']) ? sanitize_textarea_field(wp_unslash($_POST['message'])) : '';
-    $program = isset($_POST['program']) ? sanitize_text_field(wp_unslash($_POST['program'])) : '';
+    // Process form data
+    $name = sanitize_text_field($_POST['name']);
+    $email = sanitize_email($_POST['email']);
+    $phone = sanitize_text_field($_POST['phone']);
+    $message = sanitize_textarea_field($_POST['message']);
+    $program = sanitize_text_field($_POST['program']);
 
     // Here you would typically:
     // 1. Send email to admin
@@ -127,3 +174,23 @@ function iahs_add_page_template($templates)
     $templates['templates/home-modern.php'] = 'IAHS Modern Home';
     return $templates;
 }
+
+/**
+ * Debug output to identify what's being displayed
+ */
+add_action('wp_body_open', 'iahs_debug_output', 1);
+function iahs_debug_output()
+{
+    if (is_page_template('templates/home-modern.php')) {
+        echo "<!-- WP_BODY_OPEN reached -->\n";
+    }
+}
+
+add_action('wp_footer', 'iahs_debug_footer', 1);
+function iahs_debug_footer()
+{
+    if (is_page_template('templates/home-modern.php')) {
+        echo "<!-- WP_FOOTER reached -->\n";
+    }
+}
+?>

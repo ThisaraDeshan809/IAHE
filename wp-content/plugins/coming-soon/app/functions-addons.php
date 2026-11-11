@@ -63,7 +63,7 @@ function seedprod_lite_install_addon() {
 		$installer = new Plugin_Upgrader( new SeedProd_Skin() );
 		$installer->install( $download_url );
 
-		// Set referrer if one exists
+		// Set referrer if one exists.
 		if ( ! empty( $_POST['referrer'] ) ) {
 			$referrer = sanitize_text_field( wp_unslash( $_POST['referrer'] ) );
 			update_option( 'optinmonster_referred_by', $referrer );
@@ -198,6 +198,7 @@ function seedprod_lite_get_plugins_list() {
 		'stripe/stripe-checkout.php'                       => 'wpsimplepay',
 		'wp-simple-pay-pro-3/simple-pay.php'               => 'wpsimplepay-pro',
 		'easy-digital-downloads/easy-digital-downloads.php' => 'easydigitaldownloads',
+		'easy-digital-downloads-pro/easy-digital-downloads.php' => 'easydigitaldownloads-pro',
 		'searchwp/index.php'                               => 'searchwp',
 		'affiliate-wp/affiliate-wp.php'                    => 'affiliatewp',
 		'insert-headers-and-footers/ihaf.php'              => 'wpcode',
@@ -272,6 +273,7 @@ function seedprod_lite_get_plugins_array() {
 		'stripe/stripe-checkout.php'                       => 'wpsimplepay',
 		'wp-simple-pay-pro-3/simple-pay.php'               => 'wpsimplepay-pro',
 		'easy-digital-downloads/easy-digital-downloads.php' => 'easydigitaldownloads',
+		'easy-digital-downloads-pro/easy-digital-downloads.php' => 'easydigitaldownloads-pro',
 		'searchwp/index.php'                               => 'searchwp',
 		'affiliate-wp/affiliate-wp.php'                    => 'affiliatewp',
 		'insert-headers-and-footers/ihaf.php'              => 'wpcode',
@@ -322,12 +324,12 @@ function seedprod_lite_get_form_plugins_list() {
 	foreach ( $am_plugins as $slug => $label ) {
 		if ( array_key_exists( $slug, $all_plugins ) ) {
 			if ( is_plugin_active( $slug ) ) {
-				$response[ $label ] = 1; // Active
+				$response[ $label ] = 1; // Active.
 			} else {
-				$response[ $label ] = 2; // InActive
+				$response[ $label ] = 2; // InActive.
 			}
 		} else {
-			$response[ $label ] = 0; // Not installed
+			$response[ $label ] = 0; // Not installed.
 		}
 	}
 
@@ -350,12 +352,12 @@ function seedprod_lite_get_push_notification_plugins_list() {
 	foreach ( $am_plugins as $slug => $label ) {
 		if ( array_key_exists( $slug, $all_plugins ) ) {
 			if ( is_plugin_active( $slug ) ) {
-				$response[ $label ] = 1; // Active
+				$response[ $label ] = 1; // Active.
 			} else {
-				$response[ $label ] = 2; // InActive
+				$response[ $label ] = 2; // InActive.
 			}
 		} else {
-			$response[ $label ] = 0; // Not installed
+			$response[ $label ] = 0; // Not installed.
 		}
 	}
 
@@ -379,12 +381,12 @@ function seedprod_lite_get_giveaway_plugins_list() {
 	foreach ( $am_plugins as $slug => $label ) {
 		if ( array_key_exists( $slug, $all_plugins ) ) {
 			if ( is_plugin_active( $slug ) ) {
-				$response[ $label ] = 1; // Active
+				$response[ $label ] = 1; // Active.
 			} else {
-				$response[ $label ] = 2; // InActive
+				$response[ $label ] = 2; // InActive.
 			}
 		} else {
-			$response[ $label ] = 0; // Not installed
+			$response[ $label ] = 0; // Not installed.
 		}
 	}
 
@@ -412,12 +414,12 @@ function seedprod_lite_get_seo_plugins_list() {
 	foreach ( $am_plugins as $slug => $label ) {
 		if ( array_key_exists( $slug, $all_plugins ) ) {
 			if ( is_plugin_active( $slug ) ) {
-				$response[ $label ] = 1; // Active
+				$response[ $label ] = 1; // Active.
 			} else {
-				$response[ $label ] = 2; // InActive
+				$response[ $label ] = 2; // InActive.
 			}
 		} else {
-			$response[ $label ] = 0; // Not installed
+			$response[ $label ] = 0; // Not installed.
 		}
 	}
 
@@ -443,12 +445,12 @@ function seedprod_lite_get_analytics_plugins_list() {
 	foreach ( $am_plugins as $slug => $label ) {
 		if ( array_key_exists( $slug, $all_plugins ) ) {
 			if ( is_plugin_active( $slug ) ) {
-				$response[ $label ] = 1; // Active
+				$response[ $label ] = 1; // Active.
 			} else {
-				$response[ $label ] = 2; // InActive
+				$response[ $label ] = 2; // InActive.
 			}
 		} else {
-			$response[ $label ] = 0; // Not installed
+			$response[ $label ] = 0; // Not installed.
 		}
 	}
 

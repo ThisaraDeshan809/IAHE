@@ -50,7 +50,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$show_label     = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 		$default_label  = $taxonomy->label;
 		$label_text     = ! empty( $attributes['label'] ) ? wp_kses_post( $attributes['label'] ) : $default_label;
-		$wrapper_markup = '<div %1$s><label class="wp-block-categories__label' . $show_label . '" for="' . esc_attr( $id ) . '">' . $label_text . '</label>%2$s</div>';
+		$wrapper_markup = '<div %1$s><label class="wp-block-categories__label' . $show_label . '" for="' . esc_attr( $id ) . '">%3$s</label>%2$s</div>';
 		$items_markup   = wp_dropdown_categories( $args );
 		$type           = 'dropdown';
 
@@ -66,6 +66,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 	} else {
 		$args['show_option_none'] = $taxonomy->labels->no_terms;
 
+		$label_text     = '';
 		$wrapper_markup = '<ul %1$s>%2$s</ul>';
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
@@ -84,7 +85,8 @@ function render_block_core_categories( $attributes, $content, $block ) {
 	return sprintf(
 		$wrapper_markup,
 		$wrapper_attributes,
-		$items_markup
+		$items_markup,
+		$label_text
 	);
 }
 
@@ -99,20 +101,44 @@ function render_block_core_categories( $attributes, $content, $block ) {
  */
 function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	ob_start();
+
+	$exports = array( $dropdown_id, home_url() );
 	?>
 	<script>
-	( function() {
-		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
-		function onCatChange() {
-			if ( dropdown.options[ dropdown.selectedIndex ].value !== -1 ) {
-				location.href = "<?php echo esc_url( home_url() ); ?>/?" + dropdown.name + '=' + dropdown.options[ dropdown.selectedIndex ].value;
+	( ( [ dropdownId, homeUrl ] ) => {
+		const dropdown = document.getElementById( dropdownId );
+		function onSelectChange() {
+			setTimeout( () => {
+				if ( 'escape' === dropdown.dataset.lastkey ) {
+					return;
+				}
+				if ( dropdown.value && dropdown instanceof HTMLSelectElement ) {
+					const url = new URL( homeUrl );
+					url.searchParams.set( dropdown.name, dropdown.value );
+					location.href = url.href;
+				}
+			}, 250 );
+		}
+		function onKeyUp( event ) {
+			if ( 'Escape' === event.key ) {
+				dropdown.dataset.lastkey = 'escape';
+			} else {
+				delete dropdown.dataset.lastkey;
 			}
 		}
-		dropdown.onchange = onCatChange;
-	})();
+		function onClick() {
+			delete dropdown.dataset.lastkey;
+		}
+		dropdown.addEventListener( 'keyup', onKeyUp );
+		dropdown.addEventListener( 'click', onClick );
+		dropdown.addEventListener( 'change', onSelectChange );
+	} )( <?php echo wp_json_encode( $exports, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ); ?> );
 	</script>
 	<?php
-	return wp_get_inline_script_tag( str_replace( array( '<script>', '</script>' ), '', ob_get_clean() ) );
+	return wp_get_inline_script_tag(
+		trim( str_replace( array( '<script>', '</script>' ), '', ob_get_clean() ) ) .
+		"\n//# sourceURL=" . rawurlencode( __FUNCTION__ )
+	);
 }
 
 /**

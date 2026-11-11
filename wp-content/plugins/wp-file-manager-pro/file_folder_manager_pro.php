@@ -31,8 +31,6 @@ if (!class_exists('mk_file_folder_manager')):
         /* Auto Load Hooks */
         public function __construct()
         {
-            // Load required classes before registering callbacks that instantiate them.
-            $this->loadIncludes();
             add_action('activated_plugin', array(&$this, 'deactivate_file_manager_free'));
             $opt = get_option('wp_file_manager_pro');
             $folder = basename(dirname(__FILE__));
@@ -106,6 +104,8 @@ if (!class_exists('mk_file_folder_manager')):
                 ));
             });
 
+            // Load Includes
+            $this->loadIncludes();
         }
 
 	    /**
@@ -177,7 +177,7 @@ if (!class_exists('mk_file_folder_manager')):
                 $uploads = sanitize_text_field($_POST['uploads']);
                 $others = sanitize_text_field($_POST['others']);
                 if($bkpid) {
-                    require_once FILEMANEGERPROPATH . 'classes/files-restore.php';
+                    include('classes/files-restore.php');
                     $restoreFiles = new wp_file_manager_files_restore();
                     $fmbkp = $wpdb->get_row('select * from '.$fmdb.' where id = "'.$bkpid.'"');
                     if($themes == 'true') {
@@ -301,7 +301,7 @@ if (!class_exists('mk_file_folder_manager')):
                         // case 5- Database
                         if(file_exists($backup_dirname.$fmbkp->backup_name.'-db.sql.gz')) {    
                                     
-                            require_once FILEMANEGERPROPATH . 'classes/db-restore.php';
+                            include('classes/db-restore.php');
                             $restoreDatabase = new Restore_Database($fmbkp->backup_name.'-db.sql.gz');
                             if($restoreDatabase->restoreDb()) {
                                 echo wp_json_encode(array('step' => 0, 'database' => 'false','plugins' => $plugins,'themes' => $themes, 'uploads'=> $uploads, 'others' => $others,'bkpid' => '','msg' => '<li class="fm-running-list fm-custom-checked">'.__('Database backup restored successfully.', 'wp-file-manager-pro').'</li>',  'msgg' => '<li class="fm-running-list fm-custom-checked">'.__('All Done', 'wp-file-manager-pro').'</li>')); 
@@ -539,7 +539,7 @@ if (!class_exists('mk_file_folder_manager')):
               $fileName = $wpdb->get_row("select * from ".$fmdb." where id='".$id."'");              
                 //database
                 if($database == 'true') {
-                    require_once FILEMANEGERPROPATH . 'classes/db-backup.php';
+                    include('classes/db-backup.php'); 
                     $backupDatabase = new Backup_Database($fileName->backup_name);
                     $result = $backupDatabase->backupTables(TABLES);
                     if($result == '1'){
@@ -551,7 +551,7 @@ if (!class_exists('mk_file_folder_manager')):
                     }                   
                 }
                 else if($files == 'true') {
-                    require_once FILEMANEGERPROPATH . 'classes/files-backup.php';
+                    include('classes/files-backup.php');
                     $upload_dir = wp_upload_dir();
                     $backup_dirname = $upload_dir['basedir'].'/wp-file-manager-pro/fm_backup';
                     $filesBackup = new wp_file_manager_files_backup();
@@ -773,7 +773,7 @@ if (!class_exists('mk_file_folder_manager')):
                 include ABSPATH.'wp-includes/pluggable.php';
             }
             if (is_admin()) {
-                require_once FILEMANEGERPROPATH . 'controller/fm_controller.php';
+                include 'controller/fm_controller.php';
                 $fm_controller = new mk_fm_controller();
             }
 
@@ -1051,7 +1051,7 @@ if (!class_exists('mk_file_folder_manager')):
 
             $current_user = wp_get_current_user();
             check_ajax_referer('mk_wp_file_manager_nonce'.$current_user->ID );
-            require_once FILEMANEGERPROPATH . 'lib/php/autoload.php';
+            require 'lib/php/autoload.php';
             if(!isset($_REQUEST["is_type"])){
                 elFinder::$netDrivers['ftp'] = 'FTP';
             }
@@ -1071,9 +1071,7 @@ if (!class_exists('mk_file_folder_manager')):
                     $settings = get_option( 'wp_filemanager_options' );
                     $fm_user_roles = (isset($settings['fm_user_roles']) && !empty($settings['fm_user_roles'])) ? $settings['fm_user_roles'] : [];
                     $user_role = $user->roles;
-                    $authorized = !empty(array_filter($fm_user_roles, function ($value) use ($user_role) {
-                        return in_array($value, $user_role, true);
-                    }));
+                    $authorized = !empty(array_filter($fm_user_roles, fn($value) => in_array($value, $user_role)));
                 }
                 
                 foreach ($user->roles as $role):
@@ -1095,7 +1093,7 @@ if (!class_exists('mk_file_folder_manager')):
             // allowing vendor for gdrive || Dropbox
             if (class_exists('wp_file_manager_dropbox') || class_exists('wp_file_manager_googledrive')) {
                 if (file_exists(FILEMANEGERPROPATH.'lib/vendor/autoload.php')) {
-                    require_once FILEMANEGERPROPATH . 'lib/vendor/autoload.php';
+                    require 'lib/vendor/autoload.php';
                 }
             }
 
@@ -3160,13 +3158,13 @@ if($this->has_permission('cloudflarer2')) {
                 if (is_admin()):
                 $opt = get_option('wp_file_manager_pro');
                 if (empty($opt['ispro']) && empty($opt['serialkey'])) {
-                    require FILEMANEGERPROPATH . 'inc/verify.php';
+                    include 'inc/verify.php';
                 } else {
-                    include FILEMANEGERPROPATH . $folder . '/' . $page . '.php';
+                    include $folder.'/'.$page.'.php';
                 }
                 endif;
             } else {
-                include FILEMANEGERPROPATH . $folder . '/' . $page . '.php';
+                include $folder.'/'.$page.'.php';
             }
         }
 
@@ -3246,7 +3244,7 @@ if($this->has_permission('cloudflarer2')) {
                         }
                     }
                     if($has_access_fm){
-                        require_once FILEMANEGERPROPATH . 'lib/php/autoload.php';
+                        require 'lib/php/autoload.php';
                         $opt = get_option('wp_filemanager_options');
                         $file_operations = array( 'mkdir', 'mkfile', 'rename', 'duplicate', 'paste', 'ban', 'archive', 'extract', 'copy', 'cut', 'edit','rm','download', 'upload', 'search', 'info', 'help', 'empty','resize','preference','hide','netmount');
                         /*
@@ -3463,7 +3461,7 @@ if($this->has_permission('cloudflarer2')) {
         {
             $filemanagerReturn = '';
             
-            include FILEMANEGERPROPATH . 'inc/shortcode_admin_control.php';
+            include 'inc/shortcode_admin_control.php';
 
             return $filemanagerReturn;
         }
@@ -3475,7 +3473,7 @@ if($this->has_permission('cloudflarer2')) {
         public function wp_file_manager_front_view($atts)
         {
             $filemanagerReturn = '';
-            include FILEMANEGERPROPATH . 'inc/shortcode.php';
+            include 'inc/shortcode.php';
 
             return $filemanagerReturn;
         }
@@ -3510,8 +3508,8 @@ if($this->has_permission('cloudflarer2')) {
          * Load all includes Here
          */
         public function loadIncludes() {
-            require_once FILEMANEGERPROPATH . 'classes/updates.php';
-            require_once FILEMANEGERPROPATH . 'classes/common-functions.php';
+            include('classes/updates.php');
+            include('classes/common-functions.php');
         }
 
     /**
@@ -3702,7 +3700,7 @@ if($this->has_permission('cloudflarer2')) {
         {
             global $post;
             $this->fm_admin_assets();
-            include FILEMANEGERPROPATH . 'inc/fm_shortcode_btn.php';
+            include 'inc/fm_shortcode_btn.php';
         }
 
         /*
@@ -3895,7 +3893,7 @@ if($this->has_permission('cloudflarer2')) {
          */
         
         public function getMimeTypeFromExtension(){
-            require_once FILEMANEGERPROPATH . 'classes/fm-mimetypes.php';
+            include('classes/fm-mimetypes.php');
             return FM_MimeTypes::getMimeTypes();
         }
 

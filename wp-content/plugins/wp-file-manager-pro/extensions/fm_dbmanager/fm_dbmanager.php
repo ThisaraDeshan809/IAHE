@@ -111,7 +111,7 @@ class mk_db_manager
     */
     public function wp_file_manager_db_manager()
     {
-        include __DIR__ . '/inc/db_tables.php';
+        include 'inc/db_tables.php';
     }
 
     /*
@@ -612,7 +612,7 @@ class mk_db_manager
     /* Create new Table */
     public function create_tbl()
     {
-        include __DIR__ . '/inc/createTbl.php';
+        include 'inc/createTbl.php';
     }
 
     /* drop tbl */
@@ -642,7 +642,7 @@ class mk_db_manager
     /* Export DB page */
     public function export_db()
     {
-        include __DIR__ . '/inc/exportdb.php';
+        include 'inc/exportdb.php';
     }
 
     /* backup */

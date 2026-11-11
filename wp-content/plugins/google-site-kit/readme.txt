@@ -2,9 +2,9 @@
 
 Contributors:      google
 Requires at least: 5.2
-Tested up to:      6.8
+Tested up to:      6.9
 Requires PHP:      7.4
-Stable tag:        1.155.0
+Stable tag:        1.171.0
 License:           Apache License 2.0
 License URI:       https://www.apache.org/licenses/LICENSE-2.0
 Tags:              google, search-console, analytics, adsense, pagespeed-insights
@@ -109,23 +109,28 @@ Please create a new topic on our [WordPress.org support forum](https://wordpress
 
 == Changelog ==
 
-= 1.155.0 =
+= 1.171.0 =
 
 **Enhanced**
 
-* Redesign the Enhanced Measurement Banner with the new Middle SVG and In Progress Banner states. See [#10813](https://github.com/google/site-kit-wp/issues/10813).
-* Refactor Setup CTA Widgets which use the new "Top SVG" Banner component variation. See [#10716](https://github.com/google/site-kit-wp/issues/10716).
-* Update the Consent Mode, Ads Setup, and Reader Revenue Manager banner images. See [#10715](https://github.com/google/site-kit-wp/issues/10715).
-* Update the Setup CTAs to use a different/consistent image style. See [#10714](https://github.com/google/site-kit-wp/issues/10714).
-* Remove the `rrmModule` feature flag. See [#10677](https://github.com/google/site-kit-wp/issues/10677).
-* Refactor AudienceSegmentationIntroductoryOverlayNotification to use the new notifications infrastructure. See [#10391](https://github.com/google/site-kit-wp/issues/10391).
-* Enhance the loading performance of the Audiences Widget by refining the data fetching logic. See [#9982](https://github.com/google/site-kit-wp/issues/9982).
-* Update references to Google Analytics "conversions" to use the new "key events" terminology across the plugin. See [#9463](https://github.com/google/site-kit-wp/issues/9463).
-* Refactor Audience Segmentation / FPM Setup Success Subtle Notifications to use a new "on demand" notification. See [#9453](https://github.com/google/site-kit-wp/issues/9453).
+* Update generated PHP client library for Reader Revenue Manager. See [#12035](https://github.com/google/site-kit-wp/issues/12035).
+* Add Reader Revenue Manager policy violation information to the Site Health screen. See [#12018](https://github.com/google/site-kit-wp/issues/12018).
+* Add support for custom module connection status in the Settings screen. See [#12016](https://github.com/google/site-kit-wp/issues/12016).
+* Add periodic synchronization for Reader Revenue Manager publication content policy status. See [#12004](https://github.com/google/site-kit-wp/issues/12004).
+* Add data store configuration for RRM policy violation status retrieval. See [#12003](https://github.com/google/site-kit-wp/issues/12003).
+* Add necessary module settings for Reader Revenue Manager policy violations. See [#12000](https://github.com/google/site-kit-wp/issues/12000).
+* Migrate to generated Google API client libraries. See [#11983](https://github.com/google/site-kit-wp/issues/11983).
+* Update the user menu component to close the user tooltip when the menu is opened. See [#11956](https://github.com/google/site-kit-wp/issues/11956).
+* Add "Data gathering complete" Welcome modal variant to notify users when Analytics data gathering is finished. See [#11909](https://github.com/google/site-kit-wp/issues/11909).
+* Update tour tooltip styles as part of the new setup flow. See [#11812](https://github.com/google/site-kit-wp/issues/11812).
+* Update the dashboard to display the welcome modal. See [#11809](https://github.com/google/site-kit-wp/issues/11809).
 
 **Fixed**
 
-* Fix bug that could cause auth setup banners to be interrupted by another notification. See [#10903](https://github.com/google/site-kit-wp/issues/10903).
-* Update the key metrics setup banner to continue showing the progress state in the CTA button until the next page loads. See [#10721](https://github.com/google/site-kit-wp/issues/10721).
+* Fix issue in Email Reports when reporting on pages with increased page clicks. See [#12033](https://github.com/google/site-kit-wp/issues/12033).
+* Update the Email Reporting logic to avoid sending emails with no data. See [#11964](https://github.com/google/site-kit-wp/issues/11964).
+* Fix FrequencySelector component on small screens and add "Current subscription" badge. See [#11959](https://github.com/google/site-kit-wp/issues/11959).
+* Fix bugs with email reporting panel in various states. See [#11957](https://github.com/google/site-kit-wp/issues/11957).
+* Update Notices and NoticeNotifications components to follow mobile styles in tablet viewport. See [#9215](https://github.com/google/site-kit-wp/issues/9215).
 
 [See changelog for all versions](https://raw.githubusercontent.com/google/site-kit-wp/main/changelog.txt).

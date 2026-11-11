@@ -425,7 +425,7 @@ abstract class WP_Privacy_Requests_Table extends WP_List_Table {
 			'<label for="requester_%1$s"><span class="screen-reader-text">%2$s</span></label><span class="spinner"></span>',
 			esc_attr( $item->ID ),
 			/* translators: Hidden accessibility text. %s: Email address. */
-			sprintf( __( 'Select %s' ), $item->email )
+			sprintf( __( 'Select %s' ), esc_html( $item->email ) )
 		);
 	}
 
@@ -461,7 +461,7 @@ abstract class WP_Privacy_Requests_Table extends WP_List_Table {
 		echo esc_html( $status_object->label );
 
 		if ( $timestamp ) {
-			echo ' (' . $this->get_timestamp_as_date( $timestamp ) . ')';
+			echo '<span class="status-date">' . $this->get_timestamp_as_date( $timestamp ) . '</span>';
 		}
 
 		echo '</span>';
@@ -487,7 +487,14 @@ abstract class WP_Privacy_Requests_Table extends WP_List_Table {
 			return sprintf( __( '%s ago' ), human_time_diff( $timestamp ) );
 		}
 
-		return date_i18n( get_option( 'date_format' ), $timestamp );
+		return sprintf(
+			/* translators: 1: privacy request date format, 2: privacy request time format. */
+			__( '%1$s at %2$s' ),
+			/* translators: privacy request date format. See https://www.php.net/manual/en/datetime.format.php */
+			date_i18n( __( 'Y/m/d' ), $timestamp ),
+			/* translators: privacy request time format. See https://www.php.net/manual/en/datetime.format.php */
+			date_i18n( __( 'g:i a' ), $timestamp )
+		);
 	}
 
 	/**
@@ -543,7 +550,7 @@ abstract class WP_Privacy_Requests_Table extends WP_List_Table {
 	 * @return string Email column markup.
 	 */
 	public function column_email( $item ) {
-		return sprintf( '<a href="%1$s">%2$s</a> %3$s', esc_url( 'mailto:' . $item->email ), $item->email, $this->row_actions( array() ) );
+		return sprintf( '<a href="%1$s">%2$s</a> %3$s', esc_url( 'mailto:' . $item->email ), esc_html( $item->email ), $this->row_actions( array() ) );
 	}
 
 	/**

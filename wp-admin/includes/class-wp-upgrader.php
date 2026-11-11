@@ -342,6 +342,21 @@ class WP_Upgrader {
 	}
 
 	/**
+	 * Builds an unpredictable name for the directory a package is unpacked into.
+	 *
+	 * @since 7.1.4
+	 *
+	 * @param string $package The full local path or URI of the package.
+	 * @return string The directory name, without a path.
+	 */
+	private function get_working_dir_name( $package ) {
+		// Strip off any .tmp or .zip suffixes.
+		$name = basename( basename( $package, '.tmp' ), '.zip' );
+
+		return $name . '-' . wp_generate_password( 16, false );
+	}
+
+	/**
 	 * Unpacks a compressed package file.
 	 *
 	 * @since 2.8.0
@@ -364,16 +379,32 @@ class WP_Upgrader {
 
 		$upgrade_folder = $wp_filesystem->wp_content_dir() . 'upgrade/';
 
-		// Clean up contents of upgrade directory beforehand.
+		// Clean up contents of upgrade directory beforehand, keeping its index.php.
 		$upgrade_files = $wp_filesystem->dirlist( $upgrade_folder );
 		if ( ! empty( $upgrade_files ) ) {
 			foreach ( $upgrade_files as $file ) {
+				if ( 'index.php' === $file['name'] ) {
+					continue;
+				}
+
 				$wp_filesystem->delete( $upgrade_folder . $file['name'], true );
 			}
 		}
 
-		// We need a working directory - strip off any .tmp or .zip suffixes.
-		$working_dir = $upgrade_folder . basename( basename( $package, '.tmp' ), '.zip' );
+		/*
+		 * The upgrade directory is web-served. Keep it from being listed, as core does
+		 * for wp-content and its plugins and themes directories, so the name of the
+		 * working directory created below cannot be discovered from a directory index.
+		 */
+		if ( ! $wp_filesystem->is_dir( $upgrade_folder ) ) {
+			$wp_filesystem->mkdir( $upgrade_folder, FS_CHMOD_DIR );
+		}
+		if ( ! $wp_filesystem->exists( $upgrade_folder . 'index.php' ) ) {
+			$wp_filesystem->put_contents( $upgrade_folder . 'index.php', "<?php\n// Silence is golden.\n", FS_CHMOD_FILE );
+		}
+
+		// We need a working directory.
+		$working_dir = $upgrade_folder . $this->get_working_dir_name( $package );
 
 		// Clean up working directory.
 		if ( $wp_filesystem->is_dir( $working_dir ) ) {
@@ -403,7 +434,6 @@ class WP_Upgrader {
 	 * Flattens the results of WP_Filesystem_Base::dirlist() for iterating over.
 	 *
 	 * @since 4.9.0
-	 * @access protected
 	 *
 	 * @param array  $nested_files Array of files as returned by WP_Filesystem_Base::dirlist().
 	 * @param string $path         Relative path to prepend to child nodes. Optional.
@@ -1023,18 +1053,21 @@ class WP_Upgrader {
 		}
 
 		$file = $wp_filesystem->abspath() . '.maintenance';
+
 		if ( $enable ) {
 			if ( ! wp_doing_cron() ) {
 				$this->skin->feedback( 'maintenance_start' );
 			}
+
 			// Create maintenance file to signal that we are upgrading.
 			$maintenance_string = '<?php $upgrading = ' . time() . '; ?>';
 			$wp_filesystem->delete( $file );
 			$wp_filesystem->put_contents( $file, $maintenance_string, FS_CHMOD_FILE );
-		} elseif ( ! $enable && $wp_filesystem->exists( $file ) ) {
+		} elseif ( $wp_filesystem->exists( $file ) ) {
 			if ( ! wp_doing_cron() ) {
 				$this->skin->feedback( 'maintenance_end' );
 			}
+
 			$wp_filesystem->delete( $file );
 		}
 	}

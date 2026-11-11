@@ -29,7 +29,7 @@ get_header();
         }
 
         // Directly build the URL without date folder
-        const pdfUrl = `https://www.iahe.co.uk/certificates/${studentId}.pdf`;
+        const pdfUrl = `https://www.iahsaward.org.uk/certificates/${studentId}.pdf`;
 
         fetch(pdfUrl, { method: 'HEAD' })
             .then(res => {

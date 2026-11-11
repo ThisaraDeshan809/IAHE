@@ -1,39 +1,11 @@
-# WordPress credentials and host-specific configuration
-/wp-config.php
-/wp-config-*.php
-/.env
-/.env.*
-/.htaccess*
-
-# Private hosting files
-/certificates/
-/.private/
-/.tmb/
-
-# WordPress media, backups, logs, and generated content
-/wp-content/ai1wm-backups/
-/wp-content/uploads/
-/wp-content/cache/
-/wp-content/upgrade/
-/wp-content/updraft/
-/wp-content/backups/
-/wp-content/wflogs/
-
-# Database exports and archives (licensed plugin ZIPs must stay outside Git)
-*.wpress
+wp-config.php
+.env
+.env.*
 *.sql
-*.sql.gz
-*.zip
-*.tar
-*.tar.gz
-*.bak
 *.log
-
-# Root development dependencies only. Do not globally ignore vendor/ because
-# distributable WordPress plugins contain required runtime code there.
-/node_modules/
-/vendor/
-
-# OS/editor files
-.DS_Store
-Thumbs.db
+*.bak
+node_modules/
+wp-content/uploads//wp-config.php
+/wp-config.php
+/certificates/
+/wp-content/uploads/

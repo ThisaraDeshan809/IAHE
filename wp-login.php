@@ -479,7 +479,7 @@ function wp_login_viewport_meta() {
  * Check the request and redirect or display a form based on the current action.
  */
 
-$action = isset( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'login';
+$action = isset( $_REQUEST['action'] ) && is_string( $_REQUEST['action'] ) ? $_REQUEST['action'] : 'login';
 $errors = new WP_Error();
 
 if ( isset( $_GET['key'] ) ) {
@@ -1221,7 +1221,7 @@ switch ( $action ) {
 				sprintf(
 					/* translators: %s: Link to the login page. */
 					__( 'Check your email for the confirmation link, then visit the <a href="%s">login page</a>.' ),
-					wp_login_url()
+					esc_url( wp_login_url() )
 				),
 				'message'
 			);
@@ -1231,7 +1231,7 @@ switch ( $action ) {
 				sprintf(
 					/* translators: %s: Link to the login page. */
 					__( 'Registration complete. Please check your email, then visit the <a href="%s">login page</a>.' ),
-					wp_login_url()
+					esc_url( wp_login_url() )
 				),
 				'message'
 			);
@@ -1318,7 +1318,7 @@ switch ( $action ) {
 			$redirect_to = admin_url();
 		}
 
-		$reauth = empty( $_REQUEST['reauth'] ) ? false : true;
+		$reauth = ! empty( $_REQUEST['reauth'] );
 
 		$user = wp_signon( array(), $secure_cookie );
 

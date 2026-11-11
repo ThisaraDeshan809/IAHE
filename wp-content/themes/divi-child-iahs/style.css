@@ -1,9 +1,57 @@
 /*
  Theme Name:     Divi Child IAHS
  Template:       Divi
- Description:    Child theme for Divi with modern design
+ Description:    Child theme for Divi with modern design - Mobile Responsive
  Author:         Thisara Deshan
  Version:        1.0
 */
 
-/* Your custom styles below */
+/* Import parent theme styles */
+@import url("../Divi/style.css");
+
+/* Mobile Responsive Improvements for Divi */
+@media (max-width: 980px) {
+    /* Improve mobile navigation */
+    .et_mobile_menu {
+        background: var(--background-white);
+    }
+    
+    /* Adjust container padding for mobile */
+    .et_pb_row {
+        padding: 30px 0 !important;
+    }
+    
+    /* Improve mobile typography */
+    h1 {
+        font-size: 2rem !important;
+        line-height: 1.2 !important;
+    }
+    
+    h2 {
+        font-size: 1.8rem !important;
+        line-height: 1.3 !important;
+    }
+    
+    /* Ensure full width on mobile */
+    .et_pb_section {
+        padding: 50px 0 !important;
+    }
+}
+
+@media (max-width: 767px) {
+    /* Further mobile optimizations */
+    .et_pb_column {
+        margin-bottom: 30px !important;
+    }
+    
+    /* Improve button sizes for touch */
+    .et_pb_button {
+        padding: 15px 25px !important;
+        font-size: 16px !important;
+    }
+    
+    /* Ensure proper spacing */
+    .et_pb_module {
+        margin-bottom: 25px !important;
+    }
+}
